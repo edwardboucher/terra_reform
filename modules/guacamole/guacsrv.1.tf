@@ -30,8 +30,7 @@ resource "aws_instance" "guac-server1" {
   instance_type = "${var.guacsrv_instance_type}"
   subnet_id =  var.guac_pub_subnet1_id
   key_name = aws_key_pair.key_pair.key_name
-  associate_public_ip_address = true
-  tags = {
+  associate_public_ip_address = false
     Name = "rsa_guac_server_01"
     DeployedBy = "terraform"
     tostop = "true"

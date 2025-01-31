@@ -76,24 +76,6 @@ output "db_engine_out" {
   value = data.aws_rds_engine_version.test
 }
 
-module "tailscale_subnet_router" {
-  #source              = "github.com/edwardboucher/terra_reform/modules/terraform-tailscale-subnet-router"
-  source              = "../modules/terraform-tailscale-subnet-router"
-  ami_id              = "ami-026ebd4cfe2c043b2" # RHEL AMI
-  instance_type       = "t3.micro"
-  ts_router_subnet_id = module.vpc.public_subnet_ids[0]
-  subnet_cidrs        = "10.0.0.0/24"
-  tailscale_auth_key  = "tskey-api-<changeme>"
-  vm_name             = "my-tailscale-router"
-  key_name            = "my-ssh-key"
-  iam_role            = "my-instance-role"
-  advertise_routes    = [module.vpc.vpc_cidr_block]
-  rh_username         = "<changeme_user>"
-  rh_password         = "<changeme_pass>"
-  tailscale_net       = "<changeme>.ts.net"
-  refresh_tailscale_main_acl = false
-}
-
 ###########################################
 
 #Example 02 without RDS and using containerized postgresql (works with realhandsonlabs.com sandbox with random subdomain -see zone_name_pattern)
@@ -150,6 +132,10 @@ output "demo_dns_record_out" {
 output "db_engine_out" {
   value = data.aws_rds_engine_version.test
 }
+
+###########################################
+
+#Example 03 overlay network via wireguard tailscale on any VPC..
 
 module "tailscale_subnet_router" {
   #source              = "github.com/edwardboucher/terra_reform/modules/terraform-tailscale-subnet-router"

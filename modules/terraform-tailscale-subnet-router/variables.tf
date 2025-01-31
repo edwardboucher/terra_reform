@@ -27,12 +27,6 @@ variable "tailscale_auth_key" {
   sensitive   = true
 }
 
-variable "tailscale_key" {
-  description = "The Tailscale authentication key for connecting the node."
-  type        = string
-  sensitive   = true
-}
-
 variable "vm_name" {
   description = "The name tag for the Tailscale subnet router instance."
   type        = string
@@ -51,9 +45,7 @@ variable "iam_role" {
 }
 
 variable "advertise_routes" {
-  #default     = ["10.1.0.0/18","10.1.64.0/24","10.1.65.0/24"]
   default = ["10.1.64.0/18", "10.1.65.0/24"]
-  #default     = ["10.1.64.0/18"]
   type        = list(string)
   description = <<EOF
   The routes (expressed as CIDRs) to advertise as part of the Tailscale Subnet Router.
@@ -82,4 +74,9 @@ variable "rh_password" {
 variable "tailscale_net" {
   description = "The Tailscaleoverlay network name"
   type        = string
+}
+
+variable "refresh_tailscale_main_acl" {
+  type    = bool
+  default = false
 }

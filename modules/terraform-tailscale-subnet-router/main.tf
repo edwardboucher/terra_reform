@@ -17,7 +17,7 @@ terraform {
 
 provider "tailscale" {
   #Use env variable `TAILSCALE_API_KEY` instead
-  api_key = var.tailscale_key
+  api_key = var.tailscale_auth_key
   #Can be set via the `TAILSCALE_TAILNET` environment variable
   tailnet = var.tailscale_net
   #base_url = "https://api.us.tailscale.com"
@@ -28,27 +28,11 @@ resource "aws_instance" "tailscale_subnet_router" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
   subnet_id              = var.ts_router_subnet_id
-  #iam_instance_profile   = var.iam_role
-  #key_name               = var.key_name
   associate_public_ip_address = true
 
   tags = {
     Name = "tailscale-${random_string.random_suffix.result}"
   }
-  
-#   user_data = <<-EOF
-#               #!/bin/bash
-#               # Update the server and install necessary tools
-#               apt-get update -y
-#               apt-get install -y curl gnupg
-
-#               # Install Tailscale
-#               curl -fsSL https://tailscale.com/install.sh | sh
-              
-#               # Authenticate and enable the Tailscale Subnet Router
-#               tailscale up --authkey=${var.tailscale_auth_key} --advertise-routes=${var.subnet_cidrs}
-#               EOF
-# }
   user_data = data.template_file.init-tailscale.rendered
 }
 
@@ -68,4 +52,10 @@ resource "tailscale_tailnet_key" "tailnet_key" {
   preauthorized = true
   expiry        = 3600
   description   = "aws router key"
+}
+
+resource "tailscale_acl" "main" {
+  count = var.refresh_tailscale_main_acl ? 1 : 0
+  overwrite_existing_content = true
+  acl = file("tailscale_acl.json")
 }

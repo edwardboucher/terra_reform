@@ -28,12 +28,6 @@ while [ $success = false ] && [ $attempt_num -le $max_attempts ]; do
     ((attempt_num++))
   fi
 done
-
-##############loop end####
-#yum-config-manager --add-repo=https://pkgs.tailscale.com/stable/rhel/9/tailscale.repo
-#yum -y install https://pkgs.tailscale.com/stable/rhel/9/tailscale.repo
-#dnf update -y
-#curl -fsSL https://tailscale.com/install.sh | sh
 yum install firewalld -y
 systemctl enable --now firewalld
 echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf
@@ -47,7 +41,6 @@ yum install tailscale --nogpgcheck -y
 systemctl enable --now tailscaled
 # Wait a few for tailscaled to come up
 sleep 5
-
 # Start tailscale
 # We pass --advertise-tags below even though the authkey being created with those tags should result
 # in the same effect. This is to be more explicit because tailscale tags are a complicated topic.

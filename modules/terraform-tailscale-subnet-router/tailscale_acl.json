@@ -1,0 +1,28 @@
+{
+    "autoApprovers": {
+      "routes": {
+        "0.0.0.0/0": [
+          "tag:vpc-peering",
+          "autogroup:admin"
+        ]
+      }
+    },
+    "tagOwners": {
+      "tag:vpc-peering": ["autogroup:admin"]
+    },
+    "acls": [
+      {
+        "action": "accept",
+        "src": ["*"],
+        "dst": ["*:*"]
+      }
+    ],
+    "ssh": [
+      {
+        "action": "check",
+        "src": ["autogroup:member"],
+        "dst": ["autogroup:self"],
+        "users": ["autogroup:nonroot", "root"]
+      }
+    ]
+  }

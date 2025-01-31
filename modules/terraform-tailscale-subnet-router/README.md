@@ -37,4 +37,5 @@ module "tailscale_subnet_router" {
   rh_password         = "password_redhat
   tailscale_net       = "tailxxxx.ts.net"
   tailscale_key       = "tskey-api-xxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx"
+  refresh_tailscale_main_acl = true
 }

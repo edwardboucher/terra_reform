@@ -19,3 +19,17 @@ output "generated_db_password" {
 output "loadbalancer_dns" {
     value = aws_alb.alb.dns_name
 }
+
+output "guacamole_instance_id" {
+    value = aws_instance.guac-server1.id
+    description = "guac instance ID"
+}
+
+output "guacamole_instance_private_ip" {
+    value = aws_instance.guac-server1.private_ip
+    description = "guac instance internal IP"
+}
+
+output "database_security_group" {
+    value = aws_security_group.db_sec_group
+}

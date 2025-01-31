@@ -107,33 +107,20 @@ services:
     - ./drive:/drive:rw
     - ./record:/record:rw
   # postgres
-  postgres:
-    container_name: postgres_guacamole_compose
-    environment:
-      PGDATA: /var/lib/postgresql/data/guacamole
-      POSTGRES_DB: guacamoledb
-      POSTGRES_PASSWORD: '${db_pass}'
-      POSTGRES_USER: guacamole_user
-    image: postgres:15.2-alpine
-    networks:
-      - guacnetwork_compose
-    restart: always
-    volumes:
-    - ./init:/docker-entrypoint-initdb.d:z
-    - ./data:/var/lib/postgresql/data:Z
+  # NOT USING
 
   # guacamole
   guacamole:
     container_name: guacamole_compose
     depends_on:
     - guacd
-    - postgres
     environment:
       GUACD_HOSTNAME: guacd
-      POSTGRES_DATABASE: guacamoledb
-      POSTGRES_HOSTNAME: postgres
+      POSTGRES_DATABASE: '${db_name}'
+      POSTGRES_HOSTNAME: '${db_host}'
+      POSTGRES_PORT: 5432
       POSTGRES_PASSWORD: '${db_pass}'
-      POSTGRES_USER: guacamole_user
+      POSTGRES_USER: '${db_user}'
     image: guacamole/guacamole
     networks:
       - guacnetwork_compose

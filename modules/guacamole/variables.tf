@@ -39,3 +39,23 @@ variable  "region" {
 variable  "availability_zones" {
   default = ["us-east-1a","us-east-1b"]
 }
+variable "use_rds" {
+  type    = bool
+  default = false
+}
+#for RDS only##
+variable  "guac_db_host" {
+  default = "localhost:1234"
+}
+variable  "guac_db_address" {
+  default = "localhost"
+}
+variable  "guac_db_name" {
+  default = "guacamoledb"
+}
+variable  "guac_db_username" {
+  default = "guacamole_user"
+}
+variable  "guac_db_password" {
+  default = "!!guacDBacce$$!!"
+}  

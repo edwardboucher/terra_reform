@@ -122,10 +122,30 @@ locals {
     }
 }
 
+locals {
+ template_vars_rds = { 
+    db_pass = var.guac_db_password
+    db_user = var.guac_db_username
+    db_host = var.guac_db_address
+    db_name = var.guac_db_name
+    guac_admin_username = var.guac_admin_username
+    }
+}
+
 resource "aws_s3_object" "compose-yaml" {
+  count = var.use_rds ? 0 : 1
   bucket = aws_s3_bucket.b.id
   acl    = "private"
   key    = "docker-compose.yml"
   content = templatefile("${path.module}/myfiles/docker-compose.yml.tpl", local.template_vars)
+  depends_on = [aws_s3_object.content]
+}
+
+resource "aws_s3_object" "compose-yaml-rds" {
+  count = var.use_rds ? 1 : 0
+  bucket = aws_s3_bucket.b.id
+  acl    = "private"
+  key    = "docker-compose.yml"
+  content = templatefile("${path.module}/myfiles/docker-compose-rds.yml.tpl", local.template_vars_rds)
   depends_on = [aws_s3_object.content]
 }

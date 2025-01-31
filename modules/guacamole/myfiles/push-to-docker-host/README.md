@@ -65,7 +65,7 @@ The following part of docker-compose.yml will create an instance of PostgreSQL u
     container_name: postgres_guacamole_compose
     environment:
       PGDATA: /var/lib/postgresql/data/guacamole
-      POSTGRES_DB: guacamole_db
+      POSTGRES_DB: guacamoledb
       POSTGRES_PASSWORD: ChooseYourOwnPasswordHere1234
       POSTGRES_USER: guacamole_user
     image: postgres

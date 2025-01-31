@@ -1,15 +1,5 @@
 # Guacamole server containing docker images.
 
-# data "template_file" "guacdeploy"{
-#   template = "${file("./guacdeploy.sh")}"
-
-#   vars = {
-#     # db_ip = "${aws_db_instance.guacdb.address}"
-#     # db_user = "${var.db_user}"
-#     # db_password = "${var.db_password}"
-#   }
-# }
-
 data "template_cloudinit_config" "guacdeploy_config" {
   gzip = false
   base64_encode = false
@@ -30,13 +20,14 @@ resource "aws_instance" "guac-server1" {
   instance_type = "${var.guacsrv_instance_type}"
   subnet_id =  var.guac_pub_subnet1_id
   key_name = aws_key_pair.key_pair.key_name
-  associate_public_ip_address = false
-    Name = "rsa_guac_server_01"
+  associate_public_ip_address = true
+  tags = {
+    Name = "guac_server_01"
     DeployedBy = "terraform"
     tostop = "true"
   }
   # Needs the bastion server to exist since it runs the mysql init script before it can connect to the db
-  # depends_on = ["aws_instance.bastion-server1"]
+  depends_on = [aws_s3_object.compose-yaml-rds]
   user_data = "${data.template_cloudinit_config.guacdeploy_config.rendered}"
   iam_instance_profile = aws_iam_instance_profile.guac_profile.name
 }

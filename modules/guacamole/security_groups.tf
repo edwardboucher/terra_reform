@@ -129,3 +129,28 @@ resource "aws_security_group" "lb-sec" {
       description = "out all"
   }
 }
+
+resource "aws_security_group" "db_sec_group" {
+  count = var.use_rds ? 1 : 0
+  name   = "db_access_group_${random_string.seed_string.result}"
+  vpc_id = data.aws_subnet.selected.vpc_id
+  description = "DB Security Group for HTTP"
+  # ingress {
+  #   from_port   = 5432
+  #   to_port     = 5432
+  #   protocol    = "tcp"
+  #   #cidr_blocks = [formatlist("%s/32", aws_instance.guac-server1.private_ip)]
+  #   cidr_blocks = ["${aws_instance.guac-server1.private_ip}/32"]
+  #   #cidr_blocks = ["10.0.0.0/16"]
+  # }
+}
+
+resource "aws_security_group_rule" "allow_guac" {
+  count = var.use_rds ? 1 : 0
+  type              = "ingress"
+  security_group_id = aws_security_group.db_sec_group[count.index].id
+  from_port         = 5432
+  to_port           = 5432
+  protocol          = "tcp"
+  cidr_blocks       = ["${aws_instance.guac-server1.private_ip}/32"]
+}

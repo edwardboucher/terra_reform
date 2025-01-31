@@ -57,5 +57,5 @@ resource "tailscale_tailnet_key" "tailnet_key" {
 resource "tailscale_acl" "main" {
   count = var.refresh_tailscale_main_acl ? 1 : 0
   overwrite_existing_content = true
-  acl = file("tailscale_acl.json")
+  acl = file("${path.module}/tailscale_acl.json")
 }

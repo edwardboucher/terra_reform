@@ -37,6 +37,7 @@ module "vpc" {
   name          = "my-vpc"
   tags          = { "Environment" = "Dev" }
   log_retention = 14
+  usePrivateNAT = true
 }
 
 Run the following commands to deploy:

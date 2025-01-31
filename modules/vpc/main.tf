@@ -11,13 +11,13 @@ terraform {
 
 provider "aws" {
   region = var.region
-  default_tags {
-    tags = {
-    Environment = "development"
-    Application = "tailscale_test_lab"
-    Stack = "superstack"
-    }
-  }
+  # default_tags {
+  #   tags = {
+  #   Environment = "development"
+  #   Application = "app-${random_string.random_suffix.result}"
+  #   Stack = "superstack"
+  #   }
+  # }
 }
 
 resource "aws_vpc" "this" {
@@ -59,7 +59,7 @@ resource "aws_internet_gateway" "this" {
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
-  tags   = merge(var.tags, { "Name" : "Public Route Table" })
+  tags   = merge(var.tags, { "Name" : "Public Route Table ${random_string.random_suffix.result}" })
 }
 
 resource "aws_route" "public_internet_access" {
@@ -79,9 +79,6 @@ resource "aws_flow_log" "this" {
   iam_role_arn           = aws_iam_role.this.arn
   vpc_id                 = aws_vpc.this.id
   traffic_type           = "ALL"
-#   destination_options {
-#     file_format = "plain-text"
-#   }
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -119,6 +116,22 @@ resource "aws_default_route_table" "default" {
   route = []
 
   tags = {
-    Name = "Private Route Table"
+    Name = "Private Route Table ${random_string.random_suffix.result}"
   }
+}
+
+resource "aws_nat_gateway" "private_nat" {
+  count = var.usePrivateNAT ? 1 : 0
+  connectivity_type = "private"
+  subnet_id         = aws_subnet.private[0].id
+  tags = {
+    Name = "gw_NAT_${random_string.random_suffix.result}"
+  }
+}
+
+resource "aws_route" "private_nat" {
+  count = var.usePrivateNAT ? 1 : 0
+  route_table_id            = aws_default_route_table.default.id
+  destination_cidr_block    = "0.0.0.0/0"
+  nat_gateway_id = aws_nat_gateway.private_nat[count.index].id
 }

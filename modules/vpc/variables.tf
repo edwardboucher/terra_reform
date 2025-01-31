@@ -43,3 +43,9 @@ variable "region" {
   type        = string
   default     = "us-east-1"
 }
+
+variable "usePrivateNAT" {
+  description = "add NAT to private subnets"
+  type    = bool
+  default = false
+}

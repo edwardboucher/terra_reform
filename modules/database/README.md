@@ -19,7 +19,7 @@ This Terraform module creates a flexible Amazon RDS database with customizable c
 ### Basic MySQL Database
 ```hcl
 module "mysql_database" {
-  source = "./rds-module"
+  source = "github.com/edwardboucher/terra_reform/modules/database"
 
   database_type     = "mysql"
   database_name     = "myapp-database"
@@ -37,7 +37,7 @@ module "mysql_database" {
 ### PostgreSQL with Custom Configuration
 ```hcl
 module "postgresql_database" {
-  source = "./rds-module"
+  source = "github.com/edwardboucher/terra_reform/modules/database"
 
   database_type     = "postgres"
   database_name     = "analytics-db"
@@ -48,6 +48,9 @@ module "postgresql_database" {
 
   username = var.db_username
   password = var.db_password
+  db_subnet1_id = <if not defined, will use default VPC subnets>
+  db_subnet2_id = <if not defined, will use default VPC subnets>
+  vpc_security_group_ids = <if not defined, will use default VPC sec groups>
 }
 ```
 
@@ -62,13 +65,20 @@ module "postgresql_database" {
 | allocated_storage | Storage size in GB | number | 20 | No |
 | username | Database master username | string | - | Yes |
 | password | Database master password | string | - | Yes |
+| vpc_security_group_ids | Security group for Ingress | string | - | No |
+| db_subnet1_id | Subnet 01 | string | - | No |
+| db_subnet2_id | Subnet 02 | string | - | No |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| database_endpoint | Connection endpoint for the database |
+| database_endpoint | Connection endpoint for the database wth :port number|
+| database_address | Connection fqdn for the database without :port number|
 | database_port | Port the database is listening on |
+| database_name |database name |
+| database_username | User for the database |
+| database_password | User for the database |
 
 ## Security Considerations
 - Always use secret management for credentials
@@ -76,4 +86,4 @@ module "postgresql_database" {
 - Enable encryption at rest
 
 ## Note
-Ensure you have proper AWS credentials configured before applying this module.
+Enter proper AWS credentials configured before applying this module.

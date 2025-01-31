@@ -1,6 +1,6 @@
 EXAMPLE:
 module "dns_record" {
-  source = "../modules/dns_record"
+  source = "github.com/edwardboucher/terra_reform/modules/dns_record"
 
   zone_name_pattern = "*.realhandsonlabs.net"
   record_name      = "myapp"

@@ -32,7 +32,8 @@ This module pulls a Docker image from Docker Hub, tags it, and pushes it to an A
 
 ```hcl
 module "docker_to_ecr" {
-  source               = "../modules/terraform-docker-to-ecr"
+  source = "github.com/edwardboucher/terra_reform/modules/terraform-docker-to-ecr"
+  #source               = "../modules/terraform-docker-to-ecr"
   region               = "us-east-1"
   docker_hub_images    = ["nginx:latest", "redis:alpine"]
   image_tags           = ["nginx-custom", "redis-custom"]

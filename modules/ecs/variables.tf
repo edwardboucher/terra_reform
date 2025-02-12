@@ -3,10 +3,10 @@ variable "app_name" {
   default = "projectdemo"
 }
 
-# Variables
-variable "name" {
-  default = "project-alb"
-}
+# # Variables
+# variable "name" {
+#   default = "project-alb"
+# }
 
 variable "environment" {
   default = "dev"
@@ -22,7 +22,7 @@ variable "ecr_url" {
 }
 
 #AWS region
-variable "bucket_name" {
+variable "alb_log_bucket_name" {
     default = "alb_log_bucket"
 }
 

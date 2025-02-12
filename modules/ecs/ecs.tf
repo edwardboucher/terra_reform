@@ -28,10 +28,11 @@ resource "aws_ecs_task_definition" "app" {
     container_definitions = templatefile("${path.module}/container_definition_b.tpl", {
       app_name          = var.app_name
       #AWS ECR format = "${local.account_id}.dkr.ecr.${var.region}.amazonaws.com/${aws_ecr_repository.ecr.name}:anthropic-quickstarts-computer-use-demo-latest"
-      repository_url = "${var.ecr_url}:${var.image_name}"
+      image_url = "${var.ecr_url}:${var.image_name}"
       container_port = var.container_ports
       container_env_name = var.container_env_name
       container_env_value = var.container_env_value
+      container_vol_path = var.container_volume_path
   })
   depends_on = [null_resource.docker_push]
 }

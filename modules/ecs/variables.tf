@@ -43,6 +43,10 @@ variable "container_env_value" {
   default = "null"
 }
 
+variable "container_volume_path" {
+  default = "/home/computeruse/.anthropic"
+}
+
 variable "aws_subnet_public_1_id" {
   type = string
 }

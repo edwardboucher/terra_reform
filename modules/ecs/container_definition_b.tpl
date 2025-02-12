@@ -1,12 +1,12 @@
 [
   {
     "name": "${app_name}",
-    "image": "${repository_url}",
+    "image": "${image_url}",
     "portMappings": [
       { "containerPort": ${container_port}, "hostPort": ${container_port}, "protocol": "tcp" }
     ],
     "environment": [
-      { "name": "${container_env_name}", "value": "${container_env_vlue}" }
+      { "name": "${container_env_name}", "value": "${container_env_value}" }
     ],
     "healthCheck": {
       "command": ["CMD-SHELL", "curl -f http://localhost:${container_port}/ || exit 1"],
@@ -18,7 +18,7 @@
     "mountPoints": [
       {
         "sourceVolume": "efs-storage",
-        "containerPath": "/home/computeruse/.anthropic",
+        "containerPath": "${container_vol_path}",
         "readOnly": false
       }
     ]

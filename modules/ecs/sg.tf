@@ -41,20 +41,6 @@ resource "aws_security_group" "ecs_tasks" {
     security_groups = [aws_security_group.alb.id]
   }
 
-    ingress {
-    from_port       = var.container_port_streamlit
-    to_port         = var.container_port_streamlit
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb.id]
-  }
-
-      ingress {
-    from_port       = var.container_port_vnc
-    to_port         = var.container_port_vnc
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb.id]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -73,27 +59,8 @@ resource "aws_security_group" "alb" {
     from_port   = var.container_port
     to_port     = var.container_port
     protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-    #use MYIP
-    cidr_blocks = [format("%s/%s", data.external.getmyip.result["internet_ip"], "32")]
-  }
-
-  ingress {
-    from_port   = var.container_port_streamlit
-    to_port     = var.container_port_streamlit
-    protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-    #use MYIP
-    cidr_blocks = [format("%s/%s", data.external.getmyip.result["internet_ip"], "32")]
-  }
-
-  ingress {
-    from_port   = var.container_port_vnc
-    to_port     = var.container_port_vnc
-    protocol    = "tcp"
-    #cidr_blocks = ["0.0.0.0/0"]
-    #use MYIP
-    cidr_blocks = [format("%s/%s", data.external.getmyip.result["internet_ip"], "32")]
+    #use MYIP possibly
+    cidr_blocks = length(var.custom_ingress_cidr) > 0 ? var.custom_ingress_cidr : [format("%s/%s", data.external.getmyip.result["internet_ip"], "32")]
   }
 
   egress {

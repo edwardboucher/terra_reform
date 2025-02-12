@@ -54,3 +54,9 @@ variable "aws_subnet_public_1_id" {
 variable "aws_subnet_public_2_id" {
   type = string
 }
+
+variable "custom_ingress_cidr" {
+  description = "Custom CIDR blocks for ALB ingress. If not provided, uses the IP from getmyip script"
+  type        = list(string)
+  default     = []
+}

@@ -1,4 +1,4 @@
-#EXAMPLE:
+#EXAMPLE 01:
 module "ecs_deploy" {
   source = "github.com/edwardboucher/terra_reform/modules/ecs"
   app_name  = "projectdemo001"
@@ -15,3 +15,31 @@ module "ecs_deploy" {
   aws_subnet_public_2_id = subnet2_id
   custom_ingress_cidr = false
 }
+
+#EXAMPLE 02
+module "ecs_application" {
+  source = "github.com/edwardboucher/terra_reform/modules/ecs"
+
+  # Required variables
+  app_name    = "myapp"
+  environment = "dev"
+  region      = "us-east-1"
+  
+  # Container configuration
+  ecr_url     = "xxxxxxxxxxxx.dkr.ecr.us-east-1.amazonaws.com/myapp"
+  image_name  = "myapp-image-latest"
+  
+  # Networking
+  aws_subnet_public_1_id = "subnet-xxxxxxxx"  # First public subnet
+  aws_subnet_public_2_id = "subnet-yyyyyyyy"  # Second public subnet
+
+  # Container environment
+  container_env_name  = "APP_API_KEY"
+  container_env_value = "your-api-key"  # Consider using SSM Parameter Store
+}
+
+#NOTES:
+exist of env for containers?
+multiple ingress rules
+multiple ports
+diff of internal to external ports

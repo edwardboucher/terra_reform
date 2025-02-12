@@ -30,7 +30,7 @@ resource "aws_lb_target_group" "app" {
 
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.main.arn
-  port              = "8080"
+  port              = var.lb_ports
   protocol          = "HTTP"
 
   default_action {

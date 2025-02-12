@@ -22,6 +22,12 @@ variable "container_ports" {
   default     = 8080
 }
 
+variable "lb_ports" {
+  description = "load balancer front-end port mapping"
+  type        = number
+  default     = 8080
+}
+
 variable "ecr_url" {
   description = "ECR repository URL"
   type        = string

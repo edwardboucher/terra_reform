@@ -29,7 +29,7 @@ Usage Example
 Create a main.tf file and use the module as follows:
 
 module "vpc" {
-  source        = "../modules/vpc"
+  source = "github.com/edwardboucher/terra_reform/modules/vpc"
   public_subnet_count = 2
   private_subnet_count = 2
   region        = "us-east-1"

@@ -1,62 +1,34 @@
-# Variables
 variable "app_name" {
-  default = "projectdemo"
+  description = "Name of the application"
+  type        = string
+  default     = "projectdemo"
 }
-
-# # Variables
-# variable "name" {
-#   default = "project-alb"
-# }
 
 variable "environment" {
-  default = "dev"
+  description = "Environment name"
+  type        = string
+  default     = "dev"
 }
 
-#AWS region
 variable "region" {
-    default = "us-east-1"
-}
-
-variable "ecr_url" {
-    type = string
-}
-
-#AWS region
-variable "alb_log_bucket_name" {
-    default = "alb_log_bucket"
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
 }
 
 variable "container_ports" {
-    type = number
-    default = "8080"
+  description = "Container port mapping"
+  type        = number
+  default     = 8080
+}
+
+variable "ecr_url" {
+  description = "ECR repository URL"
+  type        = string
 }
 
 variable "image_name" {
-  default = "anthropic-quickstarts-computer-use-demo-latest"
-}
-
-variable "container_env_name" {
-  default = "ANTHROPIC_API_KEY"
-}
-
-variable "container_env_value" {
-  default = "null"
-}
-
-variable "container_volume_path" {
-  default = "/home/computeruse/.anthropic"
-}
-
-variable "aws_subnet_public_1_id" {
-  type = string
-}
-
-variable "aws_subnet_public_2_id" {
-  type = string
-}
-
-variable "custom_ingress_cidr" {
-  description = "Custom CIDR blocks for ALB ingress. If not provided, uses the IP from getmyip script"
-  type        = list(string)
-  default     = []
+  description = "Docker image name"
+  type        = string
+  default     = "anthropic-quickstarts-computer-use-demo-latest"
 }

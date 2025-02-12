@@ -1,16 +1,26 @@
-
-# ECS Cluster
 resource "aws_ecs_cluster" "main" {
-  name = "${var.app_name}-cluster"
+  name = "${var.app_name}-${var.environment}-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+
+  tags = {
+    Environment = var.environment
+    Name        = "${var.app_name}-cluster"
+  }
 }
 
+# Enhanced ECS Task Definition
 resource "aws_ecs_task_definition" "app" {
-  family                   = "${var.app_name}-task"
+  family                   = "${var.app_name}-${var.environment}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn           = aws_iam_role.ecs_task_role.arn
 
   volume {
     name = "efs-storage"
@@ -21,32 +31,30 @@ resource "aws_ecs_task_definition" "app" {
       transit_encryption_port = 2049
       authorization_config {
         access_point_id = aws_efs_access_point.app.id
-        iam             = "DISABLED"
+        iam             = "ENABLED"
       }
     }
   }
-    container_definitions = templatefile("${path.module}/container_definition_b.tpl", {
-      app_name          = var.app_name
-      #AWS ECR format = "${local.account_id}.dkr.ecr.${var.region}.amazonaws.com/${aws_ecr_repository.ecr.name}:anthropic-quickstarts-computer-use-demo-latest"
-      image_url = "${var.ecr_url}:${var.image_name}"
-      container_port = var.container_ports
-      container_env_name = var.container_env_name
-      container_env_value = var.container_env_value
-      container_vol_path = var.container_volume_path
-  })
-  depends_on = [null_resource.docker_push]
+
+  container_definitions = local.container_definition
+
+  tags = {
+    Environment = var.environment
+    Name        = "${var.app_name}-task"
+  }
 }
 
-# ECS Service APP
+# Enhanced ECS Service with proper health check
 resource "aws_ecs_service" "app" {
-  name            = "${var.app_name}-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.app.arn
-  desired_count   = 2
-  launch_type     = "FARGATE"
+  name                              = "${var.app_name}-${var.environment}-service"
+  cluster                          = aws_ecs_cluster.main.id
+  task_definition                  = aws_ecs_task_definition.app.arn
+  desired_count                    = 2
+  launch_type                      = "FARGATE"
+  health_check_grace_period_seconds = 120
 
   network_configuration {
-    subnets          = [aws_subnet.public_1.id, aws_subnet.public_2.id]
+    subnets          = [var.aws_subnet_public_1_id, var.aws_subnet_public_2_id]
     security_groups  = [aws_security_group.ecs_tasks.id]
     assign_public_ip = true
   }
@@ -54,30 +62,47 @@ resource "aws_ecs_service" "app" {
   load_balancer {
     target_group_arn = aws_lb_target_group.app.arn
     container_name   = var.app_name
-    container_port   = var.container_port
+    container_port   = var.container_ports
   }
 
-   load_balancer {
-    target_group_arn = aws_lb_target_group.streamlit.arn
-    container_name   = var.app_name
-    container_port   = var.container_port_streamlit
+  deployment_configuration {
+    maximum_percent         = 200
+    minimum_healthy_percent = 100
   }
 
-   load_balancer {
-    target_group_arn = aws_lb_target_group.vnc.arn
-    container_name   = var.app_name
-    container_port   = var.container_port_vnc
+  lifecycle {
+    ignore_changes = [desired_count]
   }
 
-  depends_on = [aws_lb_listener.front_end]
-
-  deployment_controller {
-    type = "ECS"
+  tags = {
+    Environment = var.environment
+    Name        = "${var.app_name}-service"
   }
 }
 
-# CloudWatch Log Group
-resource "aws_cloudwatch_log_group" "app" {
-  name              = "/ecs/${var.app_name}"
-  retention_in_days = 30
+# Enhanced ALB Target Group
+resource "aws_lb_target_group" "app" {
+  name        = "${substr(var.app_name, 0, 16)}-${var.environment}"
+  port        = var.container_ports
+  protocol    = "HTTP"
+  vpc_id      = data.aws_subnet.existing_pub_subnet1.vpc_id
+  target_type = "ip"
+
+  health_check {
+    path                = "/health"
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    matcher             = "200-299"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Environment = var.environment
+    Name        = "${var.app_name}-tg"
+  }
 }

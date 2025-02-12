@@ -38,3 +38,13 @@ variable "image_name" {
   type        = string
   default     = "anthropic-quickstarts-computer-use-demo-latest"
 }
+
+variable "container_env_name" {
+  description = "Docker container ENV name"
+  default = "ANTHROPIC_API_KEY"
+}
+
+variable "container_env_value" {
+  description = "Docker container ENV value"
+  default = "null"
+}

@@ -2,13 +2,16 @@ Creates an Elastic Container Registry (ECR) repository with configurable scannin
 Repository
 https://github.com/edwardboucher/terra_reform/tree/main/modules/ecr
 Usage
-hclCopymodule "ecr" {
+hclCopy
+
+module "ecr" {
   source = "github.com/edwardboucher/terra_reform//modules/ecr"
 
   # Optional configurations
   ecr_scan_on_push    = true        # Enable/disable image scanning on push
   ecr_encryption_type = "AES256"    # Encryption type: "AES256" or "KMS"
 }
+
 Requirements
 NameVersionterraform>= 0.12.26aws>= 3.0
 Providers

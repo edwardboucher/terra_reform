@@ -16,6 +16,21 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   })
 }
 
+resource "aws_iam_role" "task_role" {
+  name = "ecsTaskRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
 # Update Task Execution Role Policy to allow EFS
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_efs_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name

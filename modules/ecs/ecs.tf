@@ -59,11 +59,11 @@ resource "aws_ecs_service" "app" {
     assign_public_ip = true
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.app.arn
-    container_name   = var.app_name
-    container_port   = var.container_ports
-  }
+  # load_balancer {
+  #   target_group_arn = aws_lb_target_group.app.arn
+  #   container_name   = var.app_name
+  #   container_port   = var.container_ports
+  # }
 
   deployment_controller {
     type = "ECS" # "ECS" is the default, other options are "CODE_DEPLOY" or "EXTERNAL"

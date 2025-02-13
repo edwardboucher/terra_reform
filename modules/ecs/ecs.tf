@@ -106,3 +106,8 @@ resource "aws_lb_target_group" "app" {
     Name        = "${var.app_name}-tg"
   }
 }
+
+resource "aws_cloudwatch_log_group" "this" {
+  name              = "${var.name}-ecs-logs"
+  retention_in_days = var.log_retention
+}

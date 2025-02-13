@@ -41,3 +41,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "log_retention" {
+  description = "days for logs"
+  type        = number
+  default     = 30
+}

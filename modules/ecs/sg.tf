@@ -57,8 +57,8 @@ resource "aws_security_group" "alb" {
   vpc_id      = data.aws_subnet.existing_pub_subnet1.vpc_id
 
   ingress {
-    from_port   = var.container_port
-    to_port     = var.container_port
+    from_port   = var.container_ports
+    to_port     = var.container_ports
     protocol    = "tcp"
     #use MYIP possibly
     cidr_blocks = length(var.custom_ingress_cidr) > 0 ? var.custom_ingress_cidr : [format("%s/%s", data.external.getmyip.result["internet_ip"], "32")]

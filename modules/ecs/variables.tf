@@ -66,3 +66,9 @@ variable "custom_ingress_cidr" {
   type        = list(string)
   default     = []
 }
+
+variable "log_retention" {
+  description = "days for logs"
+  type        = number
+  default     = 30
+}

@@ -31,7 +31,7 @@ resource "aws_security_group_rule" "ecs_tasks_efs" {
 
 resource "aws_security_group" "ecs_tasks" {
   name        = "${var.app_name}-ecs-tasks-sg"
-  name_prefix = "${var.app_name}-${var.environment}-ecs-tasks-"
+  #name_prefix = "${var.app_name}-${var.environment}-ecs-tasks-"
   description = "ECS Tasks Security Group"
   vpc_id      = data.aws_subnet.existing_pub_subnet1.vpc_id
 

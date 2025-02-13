@@ -10,7 +10,7 @@ resource "aws_lb" "main" {
 # ALB Target Group
 resource "aws_lb_target_group" "app" {
   name        = "${substr(var.app_name, 0, 16)}-${var.environment}-tg"
-  port        = var.container_port # Ensure this is a single integer
+  port        = var.container_ports # Ensure this is a single integer
   protocol    = "HTTP"
   vpc_id      = data.aws_subnet.existing_pub_subnet1.vpc_id
   target_type = "ip"
@@ -37,7 +37,7 @@ resource "aws_lb_target_group" "app" {
 # ALB Listener
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.main.arn
-  port              = var.lb_port
+  port              = var.lb_ports
   protocol          = "HTTP"
 
   default_action {
@@ -111,7 +111,7 @@ resource "aws_ecs_service" "app" {
   load_balancer {
     target_group_arn = aws_lb_target_group.app.arn
     container_name   = var.app_name
-    container_port   = var.container_port
+    container_port   = var.container_ports
   }
 
   deployment_controller {

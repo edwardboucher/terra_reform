@@ -1,11 +1,11 @@
 # # Application Load Balancer
-# resource "aws_lb" "main" {
-#   name               = "${var.app_name}-alb"
-#   internal           = false
-#   load_balancer_type = "application"
-#   security_groups    = [aws_security_group.alb.id]
-#   subnets           = [var.aws_subnet_public_1_id, var.aws_subnet_public_2_id]
-# }
+resource "aws_lb" "main" {
+  name               = "${var.app_name}-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb.id]
+  subnets           = [var.aws_subnet_public_1_id, var.aws_subnet_public_2_id]
+}
 
 # resource "aws_lb_target_group" "app" {
 #   name        = "${var.app_name}-app-tg"
@@ -28,14 +28,14 @@
 #     }
 # }
 
-# resource "aws_lb_listener" "front_end" {
-#   load_balancer_arn = aws_lb.main.arn
-#   load_balancer_arn = module.aws_ecs_service.app.load_balancer.arn
-#   port              = var.lb_ports
-#   protocol          = "HTTP"
+resource "aws_lb_listener" "front_end" {
+  load_balancer_arn = aws_lb.main.arn
+  load_balancer_arn = module.aws_ecs_service.app.load_balancer.arn
+  port              = var.lb_ports
+  protocol          = "HTTP"
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.app.arn
-#   }
-# }
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app.arn
+  }
+}

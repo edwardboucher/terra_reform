@@ -65,7 +65,15 @@ resource "aws_ecs_service" "app" {
     container_port   = var.container_ports
   }
 
+  deployment_controller {
+    type = "ECS" # "ECS" is the default, other options are "CODE_DEPLOY" or "EXTERNAL"
+  }
+
   deployment_configuration {
+    deployment_circuit_breaker {
+      enable   = true
+      rollback = true
+    }
     maximum_percent         = 200
     minimum_healthy_percent = 100
   }

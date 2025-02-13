@@ -42,4 +42,3 @@ module "ecs_application" {
 exist of env for containers?
 multiple ingress rules
 multiple ports
-diff of internal to external ports

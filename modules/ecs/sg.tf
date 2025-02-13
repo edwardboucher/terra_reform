@@ -36,8 +36,8 @@ resource "aws_security_group" "ecs_tasks" {
   vpc_id      = data.aws_subnet.existing_pub_subnet1.vpc_id
 
   ingress {
-    from_port       = var.container_port
-    to_port         = var.container_port
+    from_port       = var.container_ports
+    to_port         = var.container_ports
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
   }

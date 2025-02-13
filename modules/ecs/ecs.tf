@@ -69,15 +69,6 @@ resource "aws_ecs_service" "app" {
     type = "ECS" # "ECS" is the default, other options are "CODE_DEPLOY" or "EXTERNAL"
   }
 
-  deployment_configuration {
-    deployment_circuit_breaker {
-      enable   = true
-      rollback = true
-    }
-    maximum_percent         = 200
-    minimum_healthy_percent = 100
-  }
-
   lifecycle {
     ignore_changes = [desired_count]
   }

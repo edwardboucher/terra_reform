@@ -41,7 +41,7 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
   vpc_endpoint_type = "Interface"
   security_group_ids = [
     #var.security_group_id
-    aws_security_group.s3_endpoint_sg
+    aws_security_group.s3_endpoint_sg.id
   ]
 
   # dynamic "subnet_configuration" {

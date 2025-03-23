@@ -24,7 +24,7 @@ locals {
   )
 
   # Calculate subnet configurations with dynamic IP addresses where not specified
-  subnet01_ipv4 = cidrhost(data.aws_subnet.s3_vpce_01.id.cidr_block, 10)
+  subnet01_ipv4 = cidrhost(data.aws_subnet.s3_vpce_01.cidr_block, 10)
 }
 
 

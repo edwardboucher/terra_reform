@@ -16,11 +16,6 @@ variable "ts_router_subnet_id" {
   type        = string
 }
 
-variable "subnet_cidrs" {
-  description = "The subnet CIDRs to advertise through Tailscale."
-  type        = string
-}
-
 variable "tailscale_auth_key" {
   description = "The Tailscale authentication key for connecting the node."
   type        = string

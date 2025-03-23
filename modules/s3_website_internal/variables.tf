@@ -14,7 +14,7 @@ variable "subnet_id_01" {
   type        = string
 }
 
-variable "ssubnet_id_02" {
+variable "s_id_02" {
   description = "Security group ID to be associated with the VPC endpoint 02"
   type        = string
 }

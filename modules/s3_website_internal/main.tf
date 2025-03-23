@@ -24,10 +24,7 @@ locals {
   )
 
   # Calculate subnet configurations with dynamic IP addresses where not specified
-  subnet_configs = [
-      subnet_id = data.aws_subnet.s3_vpce_01.id
-      ipv4      = cidrhost(data.aws_subnet.s3_vpce_01.id.cidr_block, 10)
-  ]
+  subnet01_ipv4 = cidrhost(data.aws_subnet.s3_vpce_01.id.cidr_block, 10)
 }
 
 
@@ -42,9 +39,9 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
   ]
 
   subnet_configuration {
-    subnet_id = local.subnet_configuration.subnet_id
-    ipv4 = local.subnet_configuration.ipv4
-    }
+    subnet_id = data.aws_subnet.s3_vpce_01
+    ipv4 = local.subnet01_ipv4
+  }
 
   subnet_ids = [
     data.aws_subnet.s3_vpce_01.id, data.aws_subnet.s3_vpce_02.id

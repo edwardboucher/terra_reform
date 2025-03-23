@@ -33,7 +33,7 @@ variable "vm_name" {
   default     = "tailscale-subnet-router"
 }
 
-variable "key_name" {
+variable "ssh_key_name" {
   description = "The SSH key name to access the instance."
   type        = string
 }
@@ -45,7 +45,7 @@ variable "iam_role" {
 }
 
 variable "advertise_routes" {
-  default = ["10.1.64.0/18", "10.1.65.0/24"]
+  default = ["172.31.0.0/16"]
   type        = list(string)
   description = <<EOF
   The routes (expressed as CIDRs) to advertise as part of the Tailscale Subnet Router.

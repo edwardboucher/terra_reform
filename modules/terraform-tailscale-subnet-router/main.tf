@@ -34,6 +34,7 @@ resource "aws_instance" "tailscale_subnet_router" {
     Name = "tailscale-${random_string.random_suffix.result}"
   }
   user_data = data.template_file.init-tailscale.rendered
+  
 }
 
 

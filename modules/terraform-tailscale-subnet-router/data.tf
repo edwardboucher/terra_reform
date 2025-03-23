@@ -19,3 +19,7 @@ data "template_file" "init-tailscale" {
 data "external" "getmyip" {
   program = ["/bin/bash", "${path.module}/getmyip.sh"]
 }
+
+data "aws_subnet" "tf_target_subnet_id" {
+  id = var.ts_router_subnet_id
+}

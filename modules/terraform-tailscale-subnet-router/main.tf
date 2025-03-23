@@ -46,7 +46,7 @@ output "instance_public_ip" {
   value = aws_instance.tailscale_subnet_router.public_ip
 }
 
-resource "tailscale_tailnet_key" "tailnet_key" {
+resource "tailscale_tailnet_key" "new" {
   reusable      = true
   ephemeral     = false
   preauthorized = true

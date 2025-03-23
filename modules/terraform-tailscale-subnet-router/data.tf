@@ -5,11 +5,9 @@ resource "random_string" "random_suffix" {
 }
 
 data "template_file" "init-tailscale" {
-  #template = file("./aws-user-data-tailscale.sh.tpl")
   template = file("${path.module}/aws-user-data-tailscale.sh.tpl")
-
   vars = {
-    tailnet_key = "${tailscale_tailnet_key.tailnet_key.key}"
+    tailnet_key = "${tailscale_tailnet_key.new.key}"
     tailscale_tag = var.tailscale_tag
     routes      = join(",", var.advertise_routes)
     rh_username = var.rh_username

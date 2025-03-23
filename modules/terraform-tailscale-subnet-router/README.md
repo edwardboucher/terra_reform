@@ -22,13 +22,12 @@ This module sets up a Tailscale Subnet Router on an AWS EC2 instance. It install
 ## Usage
 
 module "tailscale_subnet_router" {
-  source              = "../modules/terraform-tailscale-subnet-router"
+  source              = "github.com/edwardboucher/terra_reform/modules/modules/terraform-tailscale-subnet-router"
   ami_id              = "ami-026ebd4cfe2c043b2" # RHEL AMI
   instance_type       = "t3.micro"
   ts_router_subnet_id = module.vpc_base.public_subnet_ids[0]
   #subnet_id           = module.vpc_base.private_subnet.ids[0]
   subnet_cidrs        = "10.0.0.0/24"
-  tailscale_auth_key  = "tskey-api-xxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx"
   vm_name             = "my-tailscale-router"
   key_name            = "my-ssh-key"
   iam_role            = "my-instance-role"
@@ -36,6 +35,6 @@ module "tailscale_subnet_router" {
   rh_username         = "username_redhat"
   rh_password         = "password_redhat
   tailscale_net       = "tailxxxx.ts.net"
-  tailscale_key       = "tskey-api-xxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx"
+  tailscale_auth_key       = "tskey-api-xxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx"
   refresh_tailscale_main_acl = true
 }

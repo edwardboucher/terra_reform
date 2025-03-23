@@ -31,6 +31,7 @@ variable "vm_name" {
 variable "ssh_key_name" {
   description = "The SSH key name to access the instance."
   type        = string
+  default     = "linux-key-pair-tailscale"
 }
 
 variable "iam_role" {

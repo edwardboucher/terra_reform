@@ -33,12 +33,12 @@ resource "aws_key_pair" "key_pair_tailscale" {
   key_name   = var.ssh_key_name
   public_key = tls_private_key.key_pair.public_key_openssh
 }
-# Save file
-resource "local_file" "ssh_key_tailscale" {
-  #filename = "${aws_key_pair.key_pair.key_name}.pem"
-  filename =  "${file("${aws_key_pair.key_pair.key_name}.pem")}"
-  content  = tls_private_key.key_pair.private_key_pem
-}
+# # Save file
+# resource "local_file" "ssh_key_tailscale" {
+#   #filename = "${aws_key_pair.key_pair.key_name}.pem"
+#   filename =  "${file("${aws_key_pair.key_pair.key_name}.pem")}"
+#   content  = tls_private_key.key_pair.private_key_pem
+# }
 
 # Create a Virtual Machine for the Tailscale subnet router
 resource "aws_instance" "tailscale_subnet_router" {

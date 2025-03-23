@@ -1,5 +1,5 @@
 resource "aws_lb" "s3web-alb" {
-  name               = aws_s3_bucket.website_bucket.id
+  name               = "${var.bucket_prefix}-${var.environment}-alb"
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.s3_endpoint_sg.id]

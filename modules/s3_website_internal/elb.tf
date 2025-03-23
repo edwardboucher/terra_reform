@@ -2,7 +2,7 @@ resource "aws_lb" "s3web-alb" {
   name               = aws_s3_bucket.website_bucket.id
   internal           = true
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.s3_endpoint_sg]
+  security_groups    = [aws_security_group.s3_endpoint_sg.id]
   subnets            = [var.subnet_id_01, var.subnet_id_02]
 
   enable_deletion_protection = false

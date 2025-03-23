@@ -9,21 +9,14 @@ variable "vpc_id" {
   type        = string
 }
 
-# variable "security_group_id" {
-#   description = "Security group ID to be associated with the VPC endpoint"
-#   type        = string
-# }
+variable "subnet_id_01" {
+  description = "Security group ID to be associated with the VPC endpoint 01"
+  type        = string
+}
 
-variable "subnet_configurations" {
-  description = "List of subnet configurations for the VPC endpoint"
-  type = list(object({
-    subnet_id = string
-    ipv4      = optional(string) # Make IPv4 optional
-  }))
-  validation {
-    condition     = length(var.subnet_configurations) > 0
-    error_message = "At least one subnet configuration must be provided."
-  }
+variable "ssubnet_id_02" {
+  description = "Security group ID to be associated with the VPC endpoint 02"
+  type        = string
 }
 
 variable "bucket_prefix" {

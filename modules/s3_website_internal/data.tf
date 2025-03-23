@@ -1,5 +1,7 @@
-# Get subnet information for IP calculation
-data "aws_subnet" "endpoint_subnets" {
-  count = length(var.subnet_configurations)
-  id    = var.subnet_configurations[count.index].subnet_id
+data "aws_subnet" "s3_vpce_01" {
+  id = var.subnet_id_01
+}
+
+data "aws_subnet" "s3_vpce_02" {
+  id = var.ssubnet_id_02
 }

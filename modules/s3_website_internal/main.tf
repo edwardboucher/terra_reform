@@ -25,10 +25,8 @@ locals {
 
   # Calculate subnet configurations with dynamic IP addresses where not specified
   subnet_configs = [
-    for idx, config in var.subnet_configurations : {
-      subnet_id = config.subnet_id
-      ipv4      = config.ipv4 != null ? config.ipv4 : cidrhost(data.aws_subnet.endpoint_subnets[idx].cidr_block, 10)
-    }
+      subnet_id = data.aws_subnet.s3_vpce_01.id
+      ipv4      = cidrhost(data.aws_subnet.s3_vpce_01.id.cidr_block, 10)
   ]
 }
 
@@ -40,25 +38,17 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
   service_name      = "com.amazonaws.${var.region}.s3"
   vpc_endpoint_type = "Interface"
   security_group_ids = [
-    #var.security_group_id
     aws_security_group.s3_endpoint_sg.id
   ]
 
-  # dynamic "subnet_configuration" {
-  #   for_each = var.subnet_configurations
-  #   content {
-  #     ipv4      = subnet_configuration.value.ipv4
-  #     subnet_id = subnet_configuration.value.subnet_id
-  #   }
-  # }
+  subnet_configuration {
+    subnet_id = local.subnet_configuration.subnet_id
+    ipv4 = local.subnet_configuration.ipv4
+    }
 
-  dynamic "subnet_configuration" {
-  for_each = local.subnet_configs
-  content {
-    ipv4      = subnet_configuration.value.ipv4
-    subnet_id = subnet_configuration.value.subnet_id
-  }
-}
+  subnet_ids = [
+    data.aws_subnet.s3_vpce_01.id, data.aws_subnet.s3_vpce_02.id
+  ]
   
   # Using subnet_configurations instead of subnet_ids
   private_dns_enabled = false

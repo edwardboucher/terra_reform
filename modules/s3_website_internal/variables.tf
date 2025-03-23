@@ -4,11 +4,6 @@ variable "environment" {
   default     = "dev"
 }
 
-variable "vpc_id" {
-  description = "ID of the VPC where the S3 endpoint will be created"
-  type        = string
-}
-
 variable "subnet_id_01" {
   description = "Security group ID to be associated with the VPC endpoint 01"
   type        = string

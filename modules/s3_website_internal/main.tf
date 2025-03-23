@@ -32,7 +32,7 @@ locals {
 
 # Create a VPC endpoint for S3
 resource "aws_vpc_endpoint" "s3_endpoint" {
-  vpc_id            = var.vpc_id
+  vpc_id            = data.aws_subnet.s3_vpce_01.vpc_id
   service_name      = "com.amazonaws.${var.region}.s3"
   vpc_endpoint_type = "Interface"
   security_group_ids = [
@@ -68,7 +68,7 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
 resource "aws_security_group" "s3_endpoint_sg" {
   name        = "${var.bucket_prefix}-s3-endpoint-sg-${var.environment}"
   description = "Security group for S3 VPC endpoint - managed by Terraform"
-  vpc_id      = var.vpc_id
+  vpc_id      = data.aws_subnet.s3_vpce_01.vpc_id
   
   tags = merge(
     local.common_tags,

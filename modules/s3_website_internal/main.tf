@@ -39,7 +39,7 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
   ]
 
   subnet_configuration {
-    subnet_id = data.aws_subnet.s3_vpce_01
+    subnet_id = data.aws_subnet.s3_vpce_01.id
     ipv4 = local.subnet01_ipv4
   }
 

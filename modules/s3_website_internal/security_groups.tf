@@ -1,6 +1,6 @@
 resource "aws_security_group" "load_balancer" {
   name = "${var.bucket_prefix}-${var.environment}-lb-sg"
-  vpc_id = var.existing_vpc_id
+  vpc_id = data.aws_subnet.s3_vpce_01.vpc_id
 
   #ssh from anywhere (unnecessary)
   ingress {

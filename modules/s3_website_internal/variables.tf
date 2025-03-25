@@ -18,7 +18,7 @@ variable "bucket_prefix" {
   description = "Prefix for the S3 bucket name"
   type        = string
   validation {
-    condition     = length(var.bucket_prefix) >= 3 && length(var.bucket_prefix) <= 14
+    condition     = length(var.bucket_prefix) >= 3 && length(var.bucket_prefix) <= 3
     error_message = "Bucket prefix must be between 3 and 14 characters to allow for additional suffixes."
   }
 }

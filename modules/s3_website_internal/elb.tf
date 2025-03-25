@@ -1,5 +1,5 @@
 resource "aws_lb" "s3web-alb" {
-  name               = "${var.bucket_prefix}-${var.environment}-alb"
+  name               = "${var.bucket_prefix}-alb"
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.load_balancer.id]
@@ -14,7 +14,7 @@ resource "aws_lb" "s3web-alb" {
   #   }
 
   tags = {
-    Name        = "${var.bucket_prefix}-${var.environment}-alb"
+    Name        = "${var.bucket_prefix}-alb"
     Environment = "development"
   }
 }

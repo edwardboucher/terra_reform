@@ -201,3 +201,34 @@ resource "aws_s3_object" "website_content" {
   )
 }
 
+resource "aws_s3_bucket_policy" "b" {
+  bucket = aws_s3_bucket.website_bucket.id
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "*"
+            },
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "${aws_s3_bucket.website_bucket.arn}",
+                "${aws_s3_bucket.website_bucket.arn}/*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                  "aws:SourceVpce": [
+                    "${aws_vpc_endpoint.s3_endpoint.id}"
+                    ]
+                }
+            }
+        }
+    ]
+}
+POLICY
+}

@@ -81,12 +81,12 @@ resource "aws_security_group" "s3_endpoint_sg" {
 
 # Create an S3 bucket
 resource "aws_s3_bucket" "website_bucket" {
-  bucket        = "${var.bucket_prefix}-${var.environment}"
+  bucket        = aws_lb.s3web-alb.dns_name
   force_destroy = true
   tags = merge(
     local.common_tags,
     {
-      Name = "${var.bucket_prefix}-${var.environment}"
+      Name = aws_lb.s3web-alb.dns_name
       Description = "S3 bucket for hosting internal website content"
     }
   )

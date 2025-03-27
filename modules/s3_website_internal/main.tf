@@ -45,8 +45,8 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
   }
 
   subnet_configuration {
-  subnet_id = data.aws_subnet.s3_vpce_02.id
-  ipv4 = local.subnet02_ipv4
+    subnet_id = data.aws_subnet.s3_vpce_02.id
+    ipv4 = local.subnet02_ipv4
   }
 
   subnet_ids = [
@@ -60,21 +60,6 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
     {
       Name = "app-vpce-s3-int-${var.environment}"
       Description = "VPC Endpoint for S3 with interface type"
-    }
-  )
-}
-
-# Create a security group for the S3 endpoint
-resource "aws_security_group" "s3_endpoint_sg" {
-  name        = "${var.bucket_prefix}-s3-endpoint-sg-${var.environment}"
-  description = "Security group for S3 VPC endpoint - managed by Terraform"
-  vpc_id      = data.aws_subnet.s3_vpce_01.vpc_id
-  
-  tags = merge(
-    local.common_tags,
-    {
-      Name = "${var.bucket_prefix}-s3-endpoint-sg-${var.environment}"
-      Description = "Security group for S3 VPC endpoint"
     }
   )
 }

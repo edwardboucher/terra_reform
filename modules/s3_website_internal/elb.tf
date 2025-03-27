@@ -66,7 +66,7 @@ resource "aws_lb_listener" "my_alb_listener" {
 
 resource "aws_lb_listener_rule" "rule_b" {
   listener_arn = aws_lb_listener.my_alb_listener.arn
-  #priority     = 1
+  priority     = 1
 
   action {
     type             = "redirect"

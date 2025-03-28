@@ -23,30 +23,13 @@ provider "tailscale" {
   #base_url = "https://api.us.tailscale.com"
 }
 
-# Generates a secure private key and encodes it as PEM
-resource "tls_private_key" "key_pair" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-# Create the Key Pair
-resource "aws_key_pair" "key_pair_tailscale" {
-  key_name   = var.ssh_key_name
-  public_key = tls_private_key.key_pair.public_key_openssh
-}
-# # Save file
-# resource "local_file" "ssh_key_tailscale" {
-#   #filename = "${aws_key_pair.key_pair.key_name}.pem"
-#   filename =  "${file("${aws_key_pair.key_pair.key_name}.pem")}"
-#   content  = tls_private_key.key_pair.private_key_pem
-# }
-
 # Create a Virtual Machine for the Tailscale subnet router
 resource "aws_instance" "tailscale_subnet_router" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
   subnet_id              = var.ts_router_subnet_id
   associate_public_ip_address = true
-  key_name = aws_key_pair.key_pair_tailscale.key_name
+  key_name = var.ssh_key_name
   security_groups = [ aws_security_group.tailscale-node-sg.id  ]
   tags = {
     Name = "tailscale-${random_string.random_suffix.result}"

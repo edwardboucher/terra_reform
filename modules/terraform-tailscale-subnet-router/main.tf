@@ -47,6 +47,7 @@ resource "aws_instance" "tailscale_subnet_router" {
   subnet_id              = var.ts_router_subnet_id
   associate_public_ip_address = true
   key_name = aws_key_pair.key_pair_tailscale.key_name
+  security_groups = [ aws_security_group.tailscale-node-sg.id  ]
   tags = {
     Name = "tailscale-${random_string.random_suffix.result}"
   }

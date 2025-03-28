@@ -20,6 +20,10 @@ data "external" "getmyip" {
   program = ["/bin/bash", "${path.module}/getmyip.sh"]
 }
 
-data "aws_subnet" "tf_target_subnet_id" {
+data "aws_subnet" "tf_target_subnet" {
   id = var.ts_router_subnet_id
+}
+
+data "aws_vpc" "tf_target_vpc" {
+  id = data.aws_subnet.tf_target_subnet.vpc_id
 }

@@ -6,7 +6,7 @@ data "external" "getmyip2" {
 resource "aws_security_group" "tailscale-node-sg" {
   name        = "linux-sg"
   description = "Allow incoming traffic to the Linux EC2 Instance"
-  vpc_id      = aws_vpc.vpc.id
+  vpc_id      = data.aws_subnet.tf_target_subnet.vpc_id
   ingress {
     from_port   = 80
     to_port     = 80
@@ -27,9 +27,10 @@ resource "aws_security_group" "tailscale-node-sg" {
     to_port   = 22
     protocol  = "tcp"
     #use MYIP
-    cidr_blocks = [var.vpc_cidr]
+    cidr_blocks = [data.aws_vpc.tf_target_vpc.cidr_block]
     description = "Allow incoming SSH connections from ansible"
   }
+
   ingress {
     from_port = 0
     to_port   = 0

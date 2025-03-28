@@ -13,7 +13,7 @@ output "bucket_regional_domain_name" {
   value       = aws_s3_bucket.website_bucket.bucket_regional_domain_name
 }
 
-output "website_endpoint" {
+output "website_direct_endpoint" {
   description = "Website endpoint URL"
   value       = aws_s3_bucket_website_configuration.website_bucket_website_config.website_endpoint
 }
@@ -26,4 +26,9 @@ output "vpc_endpoint_id" {
 output "vpc_endpoint_dns_entries" {
   description = "DNS entries for the VPC endpoint"
   value       = aws_vpc_endpoint.s3_endpoint.dns_entry
+}
+
+output "website_lb_endpoint" {
+  description = "DNS entries for the VPC endpoint"
+  value       = aws_lb.s3web-alb.dns_name
 }

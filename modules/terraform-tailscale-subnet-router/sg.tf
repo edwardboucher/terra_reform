@@ -20,7 +20,7 @@ resource "aws_security_group" "tailscale-node-sg" {
     to_port     = 41641
     protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "tailscale's primary coordination port"
+    description = "tailscales primary coordination port"
   }
 
   ingress {

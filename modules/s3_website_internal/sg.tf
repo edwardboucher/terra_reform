@@ -50,4 +50,12 @@ resource "aws_security_group" "load_balancer" {
     cidr_blocks = [data.aws_vpc.discovered.cidr_block]
     description = "Allow all OUT"
   }
+
+  egress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.discovered.cidr_block]
+    description = "Allow ougoing HTTP connections"
+  }
 }

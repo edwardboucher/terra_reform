@@ -13,6 +13,7 @@ locals {
     "wav"  = "audio/wav"
     "jpg"  = "image/jpeg"
     "yaml" = "text/yaml"
+    "cjs"  = "application/javascript"
   }
   
   common_tags = merge(

@@ -1,7 +1,7 @@
 variable "string_length" {
   type        = number
   description = "The length of the random string to generate."
-  default     = 16 # Reasonable default
+  default     = 4 # Reasonable default
   validation {
     condition     = var.string_length > 0
     error_message = "The string length must be greater than zero."

@@ -99,15 +99,9 @@ This example demonstrates how to deploy Guacamole without RDS using containerize
 ### Terraform Code
 
 ```terraform
-resource "random_string" "random_suffix" {
-  length  = 8
-  special = false
-  upper   = false
-}
-
-output "random_suffix_global" {
-  value     = random_string.random_suffix.result
-  sensitive = false
+module "global_rando" {
+  source = "github.com/edwardboucher/terra_reform/modules/global_constants"
+  string_length = 10
 }
 
 module "vpc" {

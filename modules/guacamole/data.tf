@@ -1,9 +1,9 @@
 resource "random_string" "seed_string" {
-  length = 8
+  length = 4
   special = false
   upper  = true
   lower = true
-  numeric = true
+  numeric = false
 }
 
 data "aws_subnet" "guac_pub_subnet1" {

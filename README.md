@@ -18,7 +18,7 @@ This example demonstrates how to deploy Guacamole with RDS Postgresql on AWS.
 
 ```terraform
 module "global_rando" {
-  source = "github.com/edwardboucher/terra_reform/modules/global_constants"
+  source = "github.com/edwardboucher/terra_reform/modules/random_string"
   string_length = 10
 }
 
@@ -28,7 +28,7 @@ module "vpc" {
   private_subnet_count = 2
   region        = "us-east-1"
   vpc_cidr      = "10.0.0.0/16"
-  name          = "my-vpc-${module.global_rando.random_string}"
+  name          = "my-vpc-${module.global_rando.random_string_out}"
   tags          = { "Environment" = "Dev" }
   log_retention = 14
   usePrivateNAT = true
@@ -43,7 +43,7 @@ module "guac_psql" {
   allocated_storage = 20
   storage_type      = "gp3"
   username = "guacamole_user"
-  password = module.global_rando.random_string
+  password = module.global_rando.random_string_out
   db_subnet1_id = module.vpc.private_subnet_ids[0]
   db_subnet2_id = module.vpc.private_subnet_ids[1]
   vpc_security_group_ids = [module.guac001.database_security_group[0].id]
@@ -100,7 +100,7 @@ This example demonstrates how to deploy Guacamole without RDS using containerize
 
 ```terraform
 module "global_rando" {
-  source = "github.com/edwardboucher/terra_reform/modules/global_constants"
+  source = "github.com/edwardboucher/terra_reform/modules/random_string"
   string_length = 10
 }
 
@@ -110,7 +110,7 @@ module "vpc" {
   private_subnet_count = 2
   region        = "us-east-1"
   vpc_cidr      = "10.0.0.0/16"
-  name          = "my-vpc-${module.global_rando.random_string}"
+  name          = "my-vpc-${module.global_rando.random_string_out}"
   tags          = { "Environment" = "Dev" }
   log_retention = 14
   usePrivateNAT = true

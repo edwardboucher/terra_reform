@@ -1,7 +1,7 @@
 #Example
 
 module "global_rando" {
-  source = "github.com/edwardboucher/terra_reform/modules/global_constants"
+  source = "github.com/edwardboucher/terra_reform/modules/random_string"
   
   # Optional: customize these parameters
   string_length         = 4
@@ -13,5 +13,5 @@ module "global_rando" {
 
 # Access the output
 output "random_string_result" {
-  value = module.global_rando.random_string
+  value = module.random_string.random_string_out
 }

@@ -32,6 +32,10 @@ variable  "guac_admin_username" {
 }
 variable  "guac_admin_password" {
   default = "!!guacadmin!!"
+  validation {
+    condition     = length(var.guac_admin_password) <= 12 && can(regex("^[a-zA-Z0-9]+$", var.guac_admin_password))
+    error_message = "Password must be alphanumeric (uppercase/lowercase letters and numbers only) and no more than 12 characters."
+  }
 }  
 variable  "region" {
   default = "us-east-1"

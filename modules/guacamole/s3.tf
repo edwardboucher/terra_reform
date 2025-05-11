@@ -22,10 +22,10 @@ locals {
 
 resource "aws_s3_bucket" "b" {
   #bucket        = var.s3_bucket_name
-  bucket        = "guacamole_source_${random_string.seed_string.result}"
+  bucket        = "s3source_${random_string.seed_string.result}"
   force_destroy = true
   tags = {
-    Name        = "guacamole_source_${random_string.seed_string.result}"
+    Name        = "s3source_${random_string.seed_string.result}"
     Environment = "dev"
   }
 }

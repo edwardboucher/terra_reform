@@ -1,7 +1,7 @@
 resource "random_string" "seed_string" {
   length = 4
   special = false
-  upper  = true
+  upper  = false
   lower = true
   numeric = false
 }

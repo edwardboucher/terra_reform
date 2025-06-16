@@ -17,9 +17,36 @@ This example demonstrates how to deploy Guacamole with RDS Postgresql on AWS.
 ### Terraform Code
 
 ```terraform
-module "global_rando" {
-  source = "github.com/edwardboucher/terra_reform/modules/random_string"
-  string_length = 10
+##certain tf versions produce a local path problem
+#module "global_rando" {
+#  source = "github.com/edwardboucher/terra_reform/modules/random_string"
+#  string_length = 10
+#}
+
+resource "random_string" "random_suffix" {
+  length  = 4
+  special = false
+  upper   = true
+  lower   = true
+  numeric  = true
+}
+
+locals {
+  #randomString = module.global_rando.random_string_out
+  randomString = resource.random_string.random_suffix
+}
+
+resource "random_string" "random_suffix" {
+  length  = var.string_length
+  special = var.include_special_chars
+  upper   = var.include_upper_chars
+  lower   = var.include_lower_chars  # Add this to control lower case
+  numeric  = var.include_numbers # Add this to control numbers
+}
+
+locals {
+  #randomString = module.global_rando.random_string_out
+  randomString = resource.random_string.random_suffix
 }
 
 module "vpc" {
@@ -28,7 +55,7 @@ module "vpc" {
   private_subnet_count = 2
   region        = "us-east-1"
   vpc_cidr      = "10.0.0.0/16"
-  name          = "my-vpc-${module.global_rando.random_string_out}"
+  name          = "my-vpc-${local.randomString.result}"
   tags          = { "Environment" = "Dev" }
   log_retention = 14
   usePrivateNAT = true
@@ -43,7 +70,7 @@ module "guac_psql" {
   allocated_storage = 20
   storage_type      = "gp3"
   username = "guacamole_user"
-  password = module.global_rando.random_string_out
+  password = ${local.randomString.result}
   db_subnet1_id = module.vpc.private_subnet_ids[0]
   db_subnet2_id = module.vpc.private_subnet_ids[1]
   vpc_security_group_ids = [module.guac001.database_security_group[0].id]
@@ -84,7 +111,7 @@ module "base_guacserver_cert" {
 
 This example uses the following Terraform modules:
 
-* `global_rando`: generates a random suffix for the VPC name
+* `global_rando`: generates a random suffix for the VPC name (problematic)
 * `vpc`: creates a VPC with public and private subnets
 * `guac_psql`: creates an RDS Postgresql database
 * `guac001`: creates a Guacamole server with an RDS Postgresql database
@@ -110,7 +137,7 @@ module "vpc" {
   private_subnet_count = 2
   region        = "us-east-1"
   vpc_cidr      = "10.0.0.0/16"
-  name          = "my-vpc-${module.global_rando.random_string_out}"
+  name          = "my-vpc-${local.randomString.result}"
   tags          = { "Environment" = "Dev" }
   log_retention = 14
   usePrivateNAT = true
@@ -146,7 +173,7 @@ module "base_guacserver_cert" {
 
 This example uses the following Terraform modules:
 
-* `global_rando`: generates a random suffix for the VPC name
+* `global_rando`: generates a random suffix for the VPC name (problematic)
 * `vpc`: creates a VPC with public and private subnets
 * `guac001`: creates a Guacamole server without an RDS Postgresql database
 * `demo_dns_record`: creates a DNS record for the Guacamole server

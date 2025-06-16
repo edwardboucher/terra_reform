@@ -81,6 +81,7 @@ module "guac001" {
   certificate_arn = module.base_guacserver_cert.certificate_arn
   guac_pub_subnet1_id = module.vpc.public_subnet_ids[0]
   guac_pub_subnet2_id = module.vpc.public_subnet_ids[1]
+  #note: this default pass will error out..on purpose!
   guac_admin_password = "<ch@ngeME!!>"
   use_rds = true
   guac_db_host = module.guac_psql.database_endpoint

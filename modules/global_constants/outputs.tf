@@ -1,4 +1,3 @@
-output "random_string" {
-  value       = random_string.random.result
-  description = "The generated random string."
+output "random_value" {
+  value = module.global_rando.random_string
 }

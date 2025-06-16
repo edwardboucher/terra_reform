@@ -70,7 +70,7 @@ module "guac_psql" {
   allocated_storage = 20
   storage_type      = "gp3"
   username = "guacamole_user"
-  password = ${local.randomString.result}
+  password = "passwd${local.randomString.result}"
   db_subnet1_id = module.vpc.private_subnet_ids[0]
   db_subnet2_id = module.vpc.private_subnet_ids[1]
   vpc_security_group_ids = [module.guac001.database_security_group[0].id]
@@ -149,6 +149,7 @@ module "guac001" {
   certificate_arn = module.base_guacserver_cert.certificate_arn
   guac_pub_subnet1_id = module.vpc.public_subnet_ids[0]
   guac_pub_subnet2_id = module.vpc.public_subnet_ids[1]
+  #note: this default pass will error out..on purpose!
   guac_admin_password = "<ch@ngeME!!>"
   use_rds = false
 }

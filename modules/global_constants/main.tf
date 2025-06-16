@@ -9,3 +9,8 @@ resource "random_string" "random" {
   min_numeric = var.min_numbers
   min_special = var.min_special
 }
+
+output "random_string" {
+  value       = random_string.random.result
+  description = "The generated random string."
+}

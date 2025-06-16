@@ -26,14 +26,9 @@ This example demonstrates how to deploy Guacamole with RDS Postgresql on AWS.
 resource "random_string" "random_suffix" {
   length  = 4
   special = false
-  upper   = true
+  upper   = false
   lower   = true
-  numeric  = true
-}
-
-locals {
-  #randomString = module.global_rando.random_string_out
-  randomString = resource.random_string.random_suffix
+  numeric  = false
 }
 
 locals {
@@ -119,9 +114,17 @@ This example demonstrates how to deploy Guacamole without RDS using containerize
 ### Terraform Code
 
 ```terraform
-module "global_rando" {
-  source = "github.com/edwardboucher/terra_reform/modules/random_string"
-  string_length = 10
+resource "random_string" "random_suffix" {
+  length  = 4
+  special = false
+  upper   = false
+  lower   = true
+  numeric  = false
+}
+
+locals {
+  #randomString = module.global_rando.random_string_out
+  randomString = resource.random_string.random_suffix
 }
 
 module "vpc" {

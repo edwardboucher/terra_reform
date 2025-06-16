@@ -24,7 +24,7 @@ This example demonstrates how to deploy Guacamole with RDS Postgresql on AWS.
 #}
 
 resource "random_string" "random_suffix" {
-  length  = 4
+  length  = 8
   special = false
   upper   = false
   lower   = true
@@ -115,7 +115,7 @@ This example demonstrates how to deploy Guacamole without RDS using containerize
 
 ```terraform
 resource "random_string" "random_suffix" {
-  length  = 4
+  length  = 8
   special = false
   upper   = false
   lower   = true

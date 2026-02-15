@@ -62,4 +62,16 @@ variable  "guac_db_username" {
 }
 variable  "guac_db_password" {
   default = "!!guacDBacce$$!!"
-}  
+}
+
+variable "internal_lb" {
+  type        = bool
+  default     = false
+  description = "Set to true to make the ALB internal-only (accessible via Tailscale overlay)"
+}
+
+variable "associate_public_ip" {
+  type        = bool
+  default     = true
+  description = "Whether to assign a public IP to the Guac instance"
+}

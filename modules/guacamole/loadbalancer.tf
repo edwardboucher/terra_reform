@@ -6,7 +6,7 @@
 
 resource "aws_alb" "alb" {
   subnets = [var.guac_pub_subnet1_id, var.guac_pub_subnet2_id]
-  internal = false
+  internal = var.internal_lb
   security_groups = ["${aws_security_group.lb-sec.id}"]
 }
 

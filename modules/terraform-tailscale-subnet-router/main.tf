@@ -35,7 +35,10 @@ resource "aws_instance" "tailscale_subnet_router" {
     Name = "tailscale-${random_string.random_suffix.result}"
   }
   user_data = data.template_file.init-tailscale.rendered
-  
+
+  lifecycle {
+    ignore_changes = [user_data]
+  }
 }
 
 
@@ -52,8 +55,12 @@ resource "tailscale_tailnet_key" "new" {
   reusable      = true
   ephemeral     = false
   preauthorized = true
-  expiry        = 3600
+  expiry        = 86400
   description   = "aws router key"
+
+  lifecycle {
+    ignore_changes = [expiry]
+  }
 }
 
 resource "tailscale_acl" "main" {

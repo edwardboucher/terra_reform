@@ -18,8 +18,8 @@ def generate_guacamole_password_hash(password: str) -> tuple:
     # Convert the salt to its hexadecimal representation
     salt_hex = salt.hex().upper()
 
-    # Concatenate the password and the upper-case hex representation of the salt
-    combined = password.encode() + salt_hex.encode()
+    # Concatenate the password bytes and the raw salt bytes (matches Guacamole's Java SHA-256 verification)
+    combined = password.encode() + salt
 
     # Compute the SHA-256 hash
     password_hash = hashlib.sha256(combined).hexdigest()

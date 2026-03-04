@@ -7,8 +7,8 @@ terraform {
       version = "~> 5.0"
     }
     tailscale = {
-      source  = "tailscale/tailscale" // previously davidsbond/tailscale
-      version = "0.16.2"
+      source  = "tailscale/tailscale"
+      version = "~> 0.16"
     }
   }
 
@@ -16,39 +16,62 @@ terraform {
 }
 
 provider "tailscale" {
-  #Use env variable `TAILSCALE_API_KEY` instead
-  api_key = var.tailscale_auth_key
-  #Can be set via the `TAILSCALE_TAILNET` environment variable
+  api_key = var.tailscale_api_key
   tailnet = var.tailscale_net
-  #base_url = "https://api.us.tailscale.com"
 }
 
-# Create a Virtual Machine for the Tailscale subnet router
-resource "aws_instance" "tailscale_subnet_router" {
-  ami                    = var.ami_id
-  instance_type          = var.instance_type
-  subnet_id              = var.ts_router_subnet_id
-  associate_public_ip_address = true
-  key_name = var.ssh_key_name
-  vpc_security_group_ids = [ aws_security_group.tailscale-node-sg.id ]
-  tags = {
-    Name = "tailscale-${random_string.random_suffix.result}"
+resource "aws_launch_template" "tailscale" {
+  name_prefix   = "tailscale-lt-"
+  image_id      = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.ssh_key_name
+
+  network_interfaces {
+    associate_public_ip_address = var.public_ip_enabled
+    security_groups             = [aws_security_group.tailscale_node.id]
   }
-  user_data = data.template_file.init-tailscale.rendered
+
+  dynamic "iam_instance_profile" {
+    for_each = local.create_instance_profile ? [1] : []
+    content {
+      name = aws_iam_instance_profile.tailscale[0].name
+    }
+  }
+
+  user_data = base64encode(local.user_data)
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(var.tags, {
+      Name = "tailscale-${random_string.random_suffix.result}"
+    })
+  }
 
   lifecycle {
-    ignore_changes = [user_data]
+    create_before_destroy = true
   }
 }
 
+resource "aws_autoscaling_group" "tailscale" {
+  name                = "tailscale-asg-${random_string.random_suffix.result}"
+  vpc_zone_identifier = [var.ts_router_subnet_id]
+  min_size            = 1
+  max_size            = 1
+  desired_capacity    = 1
 
-# Output the instance ID and public IP
-output "instance_id" {
-  value = aws_instance.tailscale_subnet_router.id
-}
+  launch_template {
+    id      = aws_launch_template.tailscale.id
+    version = "$Latest"
+  }
 
-output "instance_public_ip" {
-  value = aws_instance.tailscale_subnet_router.public_ip
+  dynamic "tag" {
+    for_each = merge(var.tags, { Name = "tailscale-${random_string.random_suffix.result}" })
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
 }
 
 resource "tailscale_tailnet_key" "new" {
@@ -64,7 +87,9 @@ resource "tailscale_tailnet_key" "new" {
 }
 
 resource "tailscale_acl" "main" {
-  count = var.refresh_tailscale_main_acl ? 1 : 0
+  count                      = var.refresh_tailscale_main_acl ? 1 : 0
   overwrite_existing_content = true
-  acl = file("${path.module}/tailscale_acl.json")
+  acl = var.tailscale_acl_content != "" ? var.tailscale_acl_content : templatefile("${path.module}/tailscale_acl.json.tpl", {
+    tailscale_tag = var.tailscale_tag
+  })
 }

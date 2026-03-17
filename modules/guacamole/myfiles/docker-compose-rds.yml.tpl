@@ -116,11 +116,11 @@ services:
     - guacd
     environment:
       GUACD_HOSTNAME: guacd
-      POSTGRES_DATABASE: '${db_name}'
-      POSTGRES_HOSTNAME: '${db_host}'
-      POSTGRES_PORT: 5432
-      POSTGRES_PASSWORD: '${db_pass}'
-      POSTGRES_USER: '${db_user}'
+      POSTGRESQL_DATABASE: '${db_name}'
+      POSTGRESQL_HOSTNAME: '${db_host}'
+      POSTGRESQL_PORT: '5432'
+      POSTGRESQL_PASSWORD: '${db_pass}'
+      POSTGRESQL_USERNAME: '${db_user}'
     image: guacamole/guacamole
     networks:
       - guacnetwork_compose

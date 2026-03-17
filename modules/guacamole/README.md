@@ -1,5 +1,4 @@
-Builds a guac server(s) behind and ALB<br>
-
+Builds an external guac server(s) behind an ALB<br>
 EXAMPLE 01:<br>
 module "guac001" {<br>
   source = "github.com/edwardboucher/terra_reform/modules/guacamole"<br>
@@ -11,19 +10,20 @@ module "guac001" {<br>
 }<br>
 <br>
 
+Builds an internal guac server(s) behind an ALB<br>
 EXAMPLE 02:<br>
-module "guac001" {
-  source = "github.com/edwardboucher/terra_reform/modules/guacamole"
-  certificate_arn = module.base_guacserver_cert.certificate_arn
+module "guac001" {<br>
+  source = "github.com/edwardboucher/terra_reform/modules/guacamole"<br>
+  certificate_arn = module.base_guacserver_cert.certificate_arn<br>
   guac_pub_subnet1_id = subnet-0044ac22d123456789<br>
   guac_pub_subnet2_id = subnet-0044be22d123456789<br>
-  use_rds = true
-  guac_admin_password = "yourpass20252025"
-  guac_db_host = module.guac_psql.database_endpoint
-  guac_db_address = module.guac_psql.database_address
-  guac_db_name = "guacamoledb"
-  guac_db_username = module.guac_psql.database_username
-  guac_db_password = module.guac_psql.database_password
-  internal_lb         = true
-  associate_public_ip = false
-}
+  use_rds = true<br>
+  guac_admin_password = "yourpass20252025"<br>
+  guac_db_host = module.guac_psql.database_endpoint<br>
+  guac_db_address = module.guac_psql.database_address<br>
+  guac_db_name = "guacamoledb"<br>
+  guac_db_username = module.guac_psql.database_username<br>
+  guac_db_password = module.guac_psql.database_password<br>
+  internal_lb         = true<br>
+  associate_public_ip = false<br>
+}<br>

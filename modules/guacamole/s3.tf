@@ -124,10 +124,10 @@ locals {
 }
 
 locals {
- template_vars_rds = { 
-    db_pass = var.guac_db_password
+ template_vars_rds = {
+    db_pass = coalesce(var.guac_db_password, "")
     db_user = var.guac_db_username
-    db_host = var.guac_db_address
+    db_host = coalesce(var.guac_db_address, "")
     db_name = var.guac_db_name
     guac_admin_username = var.guac_admin_username
     }

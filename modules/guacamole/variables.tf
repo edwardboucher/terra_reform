@@ -53,7 +53,7 @@ variable  "guac_db_host" {
   description = "RDS endpoint including port (host:port). Only required when use_rds = true."
 }
 variable  "guac_db_address" {
-  default     = localhost
+  default     = "localhost"
   description = "RDS hostname without port. Only required when use_rds = true."
 }
 variable  "guac_db_name" {

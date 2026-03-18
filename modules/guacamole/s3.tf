@@ -131,6 +131,7 @@ locals {
     db_name = var.guac_db_name
     guac_admin_username = var.guac_admin_username
     }
+}
 
 resource "aws_s3_object" "compose-yaml" {
   count = var.use_rds ? 0 : 1

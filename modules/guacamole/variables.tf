@@ -49,11 +49,11 @@ variable "use_rds" {
 }
 #for RDS only##
 variable  "guac_db_host" {
-  default     = null
+  default = "localhost:1234"
   description = "RDS endpoint including port (host:port). Only required when use_rds = true."
 }
 variable  "guac_db_address" {
-  default     = null
+  default     = localhost
   description = "RDS hostname without port. Only required when use_rds = true."
 }
 variable  "guac_db_name" {
@@ -63,7 +63,8 @@ variable  "guac_db_username" {
   default = "guacamole_user"
 }
 variable  "guac_db_password" {
-  default     = null
+  #default     = null
+  default = "!!guacDBacce$$!!"
   description = "RDS database password. Only required when use_rds = true."
 }
 

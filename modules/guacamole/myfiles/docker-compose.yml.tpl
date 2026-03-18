@@ -130,10 +130,10 @@ services:
     - postgres
     environment:
       GUACD_HOSTNAME: guacd
-      POSTGRES_DATABASE: guacamoledb
-      POSTGRES_HOSTNAME: postgres
-      POSTGRES_PASSWORD: '${db_pass}'
-      POSTGRES_USER: guacamole_user
+      POSTGRESQL_DATABASE: guacamoledb
+      POSTGRESQL_HOSTNAME: postgres
+      POSTGRESQL_PASSWORD: '${db_pass}'
+      POSTGRESQL_USERNAME: guacamole_user
     image: guacamole/guacamole
     networks:
       - guacnetwork_compose

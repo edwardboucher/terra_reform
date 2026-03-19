@@ -120,13 +120,21 @@ resource "aws_default_route_table" "default" {
   }
 }
 
+resource "aws_eip" "nat" {
+  count  = var.usePrivateNAT ? 1 : 0
+  domain = "vpc"
+  tags   = merge(var.tags, { Name = "nat-eip-${random_string.random_suffix.result}" })
+}
+
 resource "aws_nat_gateway" "private_nat" {
-  count = var.usePrivateNAT ? 1 : 0
-  connectivity_type = "private"
-  subnet_id         = aws_subnet.private[0].id
+  count             = var.usePrivateNAT ? 1 : 0
+  connectivity_type = "public"
+  allocation_id     = aws_eip.nat[0].id
+  subnet_id         = aws_subnet.public[0].id
   tags = {
     Name = "gw_NAT_${random_string.random_suffix.result}"
   }
+  depends_on = [aws_internet_gateway.this]
 }
 
 resource "aws_route" "private_nat" {

@@ -24,8 +24,7 @@ resource "tls_private_key" "private_key" {
 }
 
 provider "acme" {
-  server_url = "https://acme-staging-v02.api.letsencrypt.org/directory"
-  #server_url = "https://acme-v02.api.letsencrypt.org/directory"
+  server_url = "https://acme-v02.api.letsencrypt.org/directory"
 }
 
 resource "acme_registration" "registration" {

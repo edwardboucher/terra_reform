@@ -6,7 +6,7 @@ echo "Hello from user-data!"
 #snap install docker
 # Add Docker's official GPG key:
 apt-get update
-apt-get install ca-certificates curl zip postgresql postgresql-client -y
+apt-get install ca-certificates curl zip jq postgresql postgresql-client -y
 apt install apt-transport-https curl software-properties-common -y
 #apt install -m 0755 -d /etc/apt/keyrings -y
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -38,4 +38,9 @@ if [ ${use_rds} = 'true' ]; then
   psql -h ${psql_hostname} -p 5432 -U ${psql_username} -d ${psql_dbname} -f ./init/initdb.sql
 fi
 docker compose up -d
+
+echo "Configuring Guacamole connections..."
+chmod +x ./guac_add_connections.sh
+./guac_add_connections.sh "${guac_admin_username}" "${guac_admin_pass}" ./connections.json
+
 echo "done"

@@ -79,3 +79,17 @@ variable "associate_public_ip" {
   default     = true
   description = "Whether to assign a public IP to the Guac instance"
 }
+
+variable "guac_target_instances" {
+  type = list(object({
+    instance_id = string
+    protocol    = string           # "rdp" or "ssh"
+    username    = string
+    password    = optional(string) # required for rdp, or ssh with password auth
+    private_key = optional(string) # for ssh with key-based auth
+    port        = optional(number) # defaults to 3389 (rdp) / 22 (ssh)
+    name        = optional(string) # defaults to the instance's "Name" tag
+  }))
+  default     = []
+  description = "EC2 instances to auto-register as Guacamole connections. Each entry is resolved to the instance's private IP at plan time; supply either 'password' or 'private_key' depending on protocol."
+}

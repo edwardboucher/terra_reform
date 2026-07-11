@@ -27,7 +27,7 @@ resource "aws_instance" "guac-server1" {
     tostop = "true"
   }
   # Needs the bastion server to exist since it runs the mysql init script before it can connect to the db
-  depends_on = [aws_s3_object.compose-yaml-rds]
+  depends_on = [aws_s3_object.compose-yaml-rds, aws_s3_object.connections-json]
   user_data = "${data.template_cloudinit_config.guacdeploy_config.rendered}"
   iam_instance_profile = aws_iam_instance_profile.guac_profile.name
 }

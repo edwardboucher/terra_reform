@@ -150,3 +150,35 @@ resource "aws_s3_object" "compose-yaml-rds" {
   content = templatefile("${path.module}/myfiles/docker-compose-rds.yml.tpl", local.template_vars_rds)
   depends_on = [aws_s3_object.content]
 }
+
+##############################################
+
+locals {
+  guac_connections = [
+    for t in var.guac_target_instances : {
+      name     = coalesce(t.name, lookup(data.aws_instance.guac_targets[t.instance_id].tags, "Name", t.instance_id))
+      protocol = t.protocol
+      parameters = merge(
+        {
+          hostname = data.aws_instance.guac_targets[t.instance_id].private_ip
+          port     = tostring(coalesce(t.port, t.protocol == "rdp" ? 3389 : 22))
+          username = t.username
+        },
+        t.password != null ? { password = t.password } : {},
+        t.private_key != null ? { "private-key" = t.private_key } : {},
+        t.protocol == "rdp" ? { security = "any", "ignore-cert" = "true" } : {},
+      )
+    }
+  ]
+}
+
+# Synced down onto the instance alongside docker-compose.yml (see the
+# recursive "aws s3 cp" in guacdeploy.sh) and consumed by
+# guac_add_connections.sh after "docker compose up -d".
+resource "aws_s3_object" "connections-json" {
+  bucket     = aws_s3_bucket.b.id
+  acl        = "private"
+  key        = "connections.json"
+  content    = jsonencode(local.guac_connections)
+  depends_on = [aws_s3_object.content]
+}

@@ -20,6 +20,13 @@ data "aws_subnet" "selected" {
 
 data "aws_caller_identity" "current" {}
 
+# Resolves each selected instance's private IP / Name tag for guac_connections
+# in s3.tf.
+data "aws_instance" "guac_targets" {
+  for_each    = { for t in var.guac_target_instances : t.instance_id => t }
+  instance_id = each.key
+}
+
 data "template_file" "guacdeploy" {
   template = "${file("${path.module}/guacdeploy.sh")}"
   vars = {

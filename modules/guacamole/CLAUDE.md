@@ -76,8 +76,9 @@ out in an inline comment, not something to silently tighten without checking wit
 guac-server1 is already up updates `aws_s3_object.connections-json` but doesn't reach the running
 instance on its own — `null_resource.sync_connections` closes that gap by re-invoking the script
 over `aws ssm send-command` (`AWS-RunShellScript`) whenever the connections list changes, matched
-via a `md5(jsonencode(local.guac_connections))` trigger. Requires the AWS CLI on whoever runs
-`terraform apply` (same assumption as `getmyip.sh`).
+via a `md5(jsonencode(local.guac_connections))` trigger. Requires the AWS CLI and `jq` on whoever
+runs `terraform apply` (same assumption as `getmyip.sh`; `jq` builds the SSM `--parameters` payload
+as a JSON file since the shell command contains quotes that break the CLI's shorthand parser).
 
 **Credentials flow**: `guac_admin_password` is validated in `variables.tf` (alphanumeric, ≤12
 chars) and baked into `initdb.sql` via `guacamole_hash.py`. The DB password is either

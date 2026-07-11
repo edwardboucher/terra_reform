@@ -35,3 +35,9 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# CLAUDE.md files stay local-only — this repo is public, and these describe
+# internal details (IAM role names, sandbox account quirks, etc.) not meant
+# for public consumers of the modules.
+CLAUDE.md
+**/CLAUDE.md

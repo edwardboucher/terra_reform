@@ -65,9 +65,19 @@ just follow existing naming when adding new files of the same logical type.
    wired in as `data "external"` blocks).
 
 **IAM**: `s3.tf` creates a single IAM role/instance profile (`guac_profile`) with broad `s3:*` on
-its own bucket plus `ec2:Describe*`/`ssm:Get*`. `guac_role_assume_role_policy` currently allows
-`principals { type = "AWS", identifiers = ["*"] }` — a known-loose default called out in an inline
-comment, not something to silently tighten without checking with the module owner.
+its own bucket, `ec2:Describe*`/`ssm:Get*`, and (as of `connections_sync.tf`)
+`AmazonSSMManagedInstanceCore` so guac-server1 is SSM-managed (Ubuntu AMIs ship the SSM Agent
+pre-installed; the role previously lacked the permissions for it to register). `guac_role_assume_role_policy`
+currently allows `principals { type = "AWS", identifiers = ["*"] }` — a known-loose default called
+out in an inline comment, not something to silently tighten without checking with the module owner.
+
+**Connection resync** (`connections_sync.tf`): `guac_add_connections.sh` (called from
+`guacdeploy.sh`) only runs once, at first boot. Adding entries to `var.guac_target_instances` after
+guac-server1 is already up updates `aws_s3_object.connections-json` but doesn't reach the running
+instance on its own — `null_resource.sync_connections` closes that gap by re-invoking the script
+over `aws ssm send-command` (`AWS-RunShellScript`) whenever the connections list changes, matched
+via a `md5(jsonencode(local.guac_connections))` trigger. Requires the AWS CLI on whoever runs
+`terraform apply` (same assumption as `getmyip.sh`).
 
 **Credentials flow**: `guac_admin_password` is validated in `variables.tf` (alphanumeric, ≤12
 chars) and baked into `initdb.sql` via `guacamole_hash.py`. The DB password is either

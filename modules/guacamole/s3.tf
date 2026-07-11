@@ -106,6 +106,15 @@ resource "aws_iam_instance_profile" "guac_profile" {
   role = aws_iam_role.s3_role_guac.name
 }
 
+# Lets SSM Agent (pre-installed on the Ubuntu AMI) register with Systems
+# Manager, so guac-server1 can be reached with "aws ssm send-command" instead
+# of opening SSH — used by connections_sync.tf to re-run
+# guac_add_connections.sh without recreating the instance.
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.s3_role_guac.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 ##############################################
 
 resource "random_string" "db_pass" {

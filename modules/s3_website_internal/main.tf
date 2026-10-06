@@ -66,13 +66,19 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
 }
 
 # Create an S3 bucket
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
 resource "aws_s3_bucket" "website_bucket" {
-  bucket        = aws_lb.s3web-alb.dns_name
+  bucket        = "${var.bucket_prefix}-${random_string.bucket_suffix.result}"
   force_destroy = true
   tags = merge(
     local.common_tags,
     {
-      Name = aws_lb.s3web-alb.dns_name
+      Name = "${var.bucket_prefix}-${random_string.bucket_suffix.result}"
       Description = "S3 bucket for hosting internal website content"
     }
   )

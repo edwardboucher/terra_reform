@@ -1,22 +1,22 @@
 locals {
   mime_types = {
-    "css"  = "text/css"
-    "html" = "text/html"
-    "ico"  = "image/vnd.microsoft.icon"
-    "js"   = "application/javascript"
-    "json" = "application/json"
-    "map"  = "application/json"
-    "png"  = "image/png"
-    "svg"  = "image/svg+xml"
-    "txt"  = "text/plain"
-    "wav"  = "audio/wav"
-    "jpg"  = "image/jpeg"
-    "yaml" = "text/yaml"
-    "yml" = "text/yaml"
-    "sh"  = "text/x-shellscript"
-    "template"  = "text/template"
-    "md"  = "text/md"
-    "py"  = "application/x-python-code"
+    "css"      = "text/css"
+    "html"     = "text/html"
+    "ico"      = "image/vnd.microsoft.icon"
+    "js"       = "application/javascript"
+    "json"     = "application/json"
+    "map"      = "application/json"
+    "png"      = "image/png"
+    "svg"      = "image/svg+xml"
+    "txt"      = "text/plain"
+    "wav"      = "audio/wav"
+    "jpg"      = "image/jpeg"
+    "yaml"     = "text/yaml"
+    "yml"      = "text/yaml"
+    "sh"       = "text/x-shellscript"
+    "template" = "text/template"
+    "md"       = "text/md"
+    "py"       = "application/x-python-code"
   }
 }
 
@@ -56,23 +56,23 @@ resource "aws_iam_role" "s3_role_guac" {
           Action = [
             "s3:GetBucketLocation",
             "s3:ListAllMyBuckets"
-            ]
-          Effect = "Allow",
+          ]
+          Effect   = "Allow",
           Resource = "arn:aws:s3:::*"
         },
         {
           Action = [
             "s3:*"
-            ]
+          ]
           Effect = "Allow",
-          Resource = [ 
+          Resource = [
             "${aws_s3_bucket.b.arn}",
-            "${aws_s3_bucket.b.arn}/*" 
+            "${aws_s3_bucket.b.arn}/*"
           ]
         },
         {
-          Effect   = "Allow"
-          Action   = [
+          Effect = "Allow"
+          Action = [
             "ec2:Describe*",
             "ssm:GetParameter",
             "ssm:GetParameters",
@@ -80,7 +80,7 @@ resource "aws_iam_role" "s3_role_guac" {
           ]
           Resource = [
             "*",
-            "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/guac/*"  # Adjust this as needed
+            "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter/guac/*" # Adjust this as needed
           ]
         },
       ]
@@ -93,9 +93,11 @@ data "aws_iam_policy_document" "guac_role_assume_role_policy" {
   statement {
     actions = ["sts:AssumeRole"]
 
+    # Only the guac-server1 instance profile assumes this role; it grants s3:*
+    # on the bucket holding connections.json (target credentials).
     principals {
-      type        = "AWS"
-      identifiers = ["*"]  # Replace with specific role/user ARN if needed for security
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
     }
   }
 }
@@ -118,45 +120,45 @@ resource "aws_iam_role_policy_attachment" "ssm_core" {
 ##############################################
 
 resource "random_string" "db_pass" {
-  length = 16
+  length  = 16
   special = true
-  upper  = true
-  lower = true
+  upper   = true
+  lower   = true
   numeric = true
 }
 
 locals {
- template_vars = { 
-    db_pass = random_string.db_pass.result
+  template_vars = {
+    db_pass             = random_string.db_pass.result
     guac_admin_username = var.guac_admin_username
-    }
+  }
 }
 
 locals {
- template_vars_rds = { 
-    db_pass = var.guac_db_password
-    db_user = var.guac_db_username
-    db_host = var.guac_db_address
-    db_name = var.guac_db_name
+  template_vars_rds = {
+    db_pass             = var.guac_db_password
+    db_user             = var.guac_db_username
+    db_host             = var.guac_db_address
+    db_name             = var.guac_db_name
     guac_admin_username = var.guac_admin_username
-    }
+  }
 }
 
 resource "aws_s3_object" "compose-yaml" {
-  count = var.use_rds ? 0 : 1
-  bucket = aws_s3_bucket.b.id
-  acl    = "private"
-  key    = "docker-compose.yml"
-  content = templatefile("${path.module}/myfiles/docker-compose.yml.tpl", local.template_vars)
+  count      = var.use_rds ? 0 : 1
+  bucket     = aws_s3_bucket.b.id
+  acl        = "private"
+  key        = "docker-compose.yml"
+  content    = templatefile("${path.module}/myfiles/docker-compose.yml.tpl", local.template_vars)
   depends_on = [aws_s3_object.content]
 }
 
 resource "aws_s3_object" "compose-yaml-rds" {
-  count = var.use_rds ? 1 : 0
-  bucket = aws_s3_bucket.b.id
-  acl    = "private"
-  key    = "docker-compose.yml"
-  content = templatefile("${path.module}/myfiles/docker-compose-rds.yml.tpl", local.template_vars_rds)
+  count      = var.use_rds ? 1 : 0
+  bucket     = aws_s3_bucket.b.id
+  acl        = "private"
+  key        = "docker-compose.yml"
+  content    = templatefile("${path.module}/myfiles/docker-compose-rds.yml.tpl", local.template_vars_rds)
   depends_on = [aws_s3_object.content]
 }
 
@@ -164,12 +166,12 @@ resource "aws_s3_object" "compose-yaml-rds" {
 
 locals {
   guac_connections = [
-    for t in var.guac_target_instances : {
-      name     = coalesce(t.name, lookup(data.aws_instance.guac_targets[t.instance_id].tags, "Name", t.instance_id))
+    for i, t in var.guac_target_instances : {
+      name     = coalesce(t.name, lookup(data.aws_instance.guac_targets[tostring(i)].tags, "Name", t.instance_id))
       protocol = t.protocol
       parameters = merge(
         {
-          hostname = data.aws_instance.guac_targets[t.instance_id].private_ip
+          hostname = data.aws_instance.guac_targets[tostring(i)].private_ip
           port     = tostring(coalesce(t.port, t.protocol == "rdp" ? 3389 : 22))
           username = t.username
         },

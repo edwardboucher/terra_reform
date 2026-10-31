@@ -7,6 +7,5 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = var.region
-}
+# No provider block: inherits the caller's aws provider (and its default_tags).
+# var.region is still used by connections_sync.tf and the IAM policy.

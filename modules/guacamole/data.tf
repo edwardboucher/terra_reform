@@ -1,8 +1,8 @@
 resource "random_string" "seed_string" {
-  length = 4
+  length  = 4
   special = false
-  upper  = false
-  lower = true
+  upper   = false
+  lower   = true
   numeric = false
 }
 
@@ -21,22 +21,24 @@ data "aws_subnet" "selected" {
 data "aws_caller_identity" "current" {}
 
 # Resolves each selected instance's private IP / Name tag for guac_connections
-# in s3.tf.
+# in s3.tf. Keyed by list index rather than instance_id: the targets are
+# usually created in the same apply, so their IDs are unknown at plan time and
+# can't be for_each keys. Only the ID goes in the value, which may be unknown.
 data "aws_instance" "guac_targets" {
-  for_each    = { for t in var.guac_target_instances : t.instance_id => t }
-  instance_id = each.key
+  for_each    = { for i, t in var.guac_target_instances : tostring(i) => t.instance_id }
+  instance_id = each.value
 }
 
 data "template_file" "guacdeploy" {
-  template = "${file("${path.module}/guacdeploy.sh")}"
+  template = file("${path.module}/guacdeploy.sh")
   vars = {
-    s3_bucket_uri = join("", ["s3://",aws_s3_bucket.b.bucket,"/"])
+    s3_bucket_uri       = join("", ["s3://", aws_s3_bucket.b.bucket, "/"])
     guac_admin_username = var.guac_admin_username
-    guac_admin_pass = var.guac_admin_password
-    psql_hostname = var.guac_db_address
-    psql_username = var.guac_db_username
-    psql_dbname = var.guac_db_name
-    psql_password = var.guac_db_password
-    use_rds = var.use_rds
+    guac_admin_pass     = var.guac_admin_password
+    psql_hostname       = var.guac_db_address
+    psql_username       = var.guac_db_username
+    psql_dbname         = var.guac_db_name
+    psql_password       = var.guac_db_password
+    use_rds             = var.use_rds
   }
 }

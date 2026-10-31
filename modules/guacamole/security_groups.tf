@@ -12,7 +12,7 @@ data "external" "getmyip_priv" {
 
 # allow all egress traffic
 resource "aws_security_group" "allout" {
-  name = "allout-secgroup"
+  name   = "allout-secgroup"
   vpc_id = data.aws_subnet.guac_pub_subnet1.vpc_id
 
   egress {
@@ -26,7 +26,7 @@ resource "aws_security_group" "allout" {
 
 # Security group definition
 resource "aws_security_group" "guac-sec" {
-  name = "guacserver-secgroup"
+  name   = "guacserver-secgroup"
   vpc_id = data.aws_subnet.guac_pub_subnet1.vpc_id
 
   # Guac listens on 8443
@@ -34,7 +34,7 @@ resource "aws_security_group" "guac-sec" {
     from_port   = 8443
     to_port     = 8443
     protocol    = "tcp"
-    cidr_blocks = [data.aws_subnet.guac_pub_subnet1.cidr_block,data.aws_subnet.guac_pub_subnet2.cidr_block]
+    cidr_blocks = [data.aws_subnet.guac_pub_subnet1.cidr_block, data.aws_subnet.guac_pub_subnet2.cidr_block]
     description = "GUAC access from VPC"
   }
   # SSH from external IP - only when not internal-only
@@ -44,7 +44,7 @@ resource "aws_security_group" "guac-sec" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = [format("%s/%s",data.external.getmyip.result["internet_ip"],32)]
+      cidr_blocks = [format("%s/%s", data.external.getmyip.result["internet_ip"], 32)]
       description = "SSH c9 private address ia peering"
     }
   }
@@ -55,7 +55,7 @@ resource "aws_security_group" "guac-sec" {
       from_port   = 8
       to_port     = 0
       protocol    = "icmp"
-      cidr_blocks = [format("%s/%s",data.external.getmyip.result["internet_ip"],32)]
+      cidr_blocks = [format("%s/%s", data.external.getmyip.result["internet_ip"], 32)]
       description = "PING c9 private address ia peering"
     }
   }
@@ -68,7 +68,7 @@ resource "aws_security_group" "guac-sec" {
 ###############################################
 
 resource "aws_security_group" "lb-sec" {
-  name = "lb-secgroup"
+  name   = "lb-secgroup"
   vpc_id = data.aws_subnet.guac_pub_subnet1.vpc_id
 
   # HTTPS access from external IP - only when not internal-only
@@ -78,7 +78,7 @@ resource "aws_security_group" "lb-sec" {
       from_port   = 8443
       to_port     = 8443
       protocol    = "tcp"
-      cidr_blocks = [format("%s/%s",data.external.getmyip.result["internet_ip"],32)]
+      cidr_blocks = [format("%s/%s", data.external.getmyip.result["internet_ip"], 32)]
       description = "default gui access from c9"
     }
   }
@@ -89,7 +89,7 @@ resource "aws_security_group" "lb-sec" {
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_blocks = [format("%s/%s",data.external.getmyip.result["internet_ip"],32)]
+      cidr_blocks = [format("%s/%s", data.external.getmyip.result["internet_ip"], 32)]
       description = "default gui access from c9"
     }
   }
@@ -99,7 +99,7 @@ resource "aws_security_group" "lb-sec" {
     from_port   = 8443
     to_port     = 8443
     protocol    = "tcp"
-    cidr_blocks = [data.aws_subnet.guac_pub_subnet1.cidr_block,data.aws_subnet.guac_pub_subnet2.cidr_block]
+    cidr_blocks = [data.aws_subnet.guac_pub_subnet1.cidr_block, data.aws_subnet.guac_pub_subnet2.cidr_block]
     description = "gui access from VPC subnets"
   }
 
@@ -107,15 +107,31 @@ resource "aws_security_group" "lb-sec" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [data.aws_subnet.guac_pub_subnet1.cidr_block,data.aws_subnet.guac_pub_subnet2.cidr_block]
+    cidr_blocks = [data.aws_subnet.guac_pub_subnet1.cidr_block, data.aws_subnet.guac_pub_subnet2.cidr_block]
     description = "gui access from VPC subnets"
+  }
+  
+    ingress {
+    from_port   = 8443
+    to_port     = 8443
+    protocol    = "tcp"
+    cidr_blocks =  ["192.5.18.7/32"]
+    description = "gui access from work NAT"
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks =  ["192.5.18.7/32"]
+    description = "gui access from work NAT"
   }
 
   egress {
     from_port   = 8443
     to_port     = 8443
     protocol    = "tcp"
-    cidr_blocks = [data.aws_subnet.guac_pub_subnet1.cidr_block,data.aws_subnet.guac_pub_subnet2.cidr_block]
+    cidr_blocks = [data.aws_subnet.guac_pub_subnet1.cidr_block, data.aws_subnet.guac_pub_subnet2.cidr_block]
     description = "out all 8443 to vpc"
   }
 
@@ -123,7 +139,7 @@ resource "aws_security_group" "lb-sec" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [data.aws_subnet.guac_pub_subnet1.cidr_block,data.aws_subnet.guac_pub_subnet2.cidr_block]
+    cidr_blocks = [data.aws_subnet.guac_pub_subnet1.cidr_block, data.aws_subnet.guac_pub_subnet2.cidr_block]
     description = "out all 443 to vpc"
   }
 
@@ -134,7 +150,7 @@ resource "aws_security_group" "lb-sec" {
       from_port   = 8
       to_port     = 0
       protocol    = "icmp"
-      cidr_blocks = [format("%s/%s",data.external.getmyip.result["internet_ip"],32)]
+      cidr_blocks = [format("%s/%s", data.external.getmyip.result["internet_ip"], 32)]
       description = "default ping from c9"
     }
   }
@@ -145,16 +161,16 @@ resource "aws_security_group" "lb-sec" {
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
-      cidr_blocks = [format("%s/%s",data.external.getmyip.result["internet_ip"],32)]
+      cidr_blocks = [format("%s/%s", data.external.getmyip.result["internet_ip"], 32)]
       description = "out all"
     }
   }
 }
 
 resource "aws_security_group" "db_sec_group" {
-  count = var.use_rds ? 1 : 0
-  name   = "db_access_group_${random_string.seed_string.result}"
-  vpc_id = data.aws_subnet.selected.vpc_id
+  count       = var.use_rds ? 1 : 0
+  name        = "db_access_group_${random_string.seed_string.result}"
+  vpc_id      = data.aws_subnet.selected.vpc_id
   description = "DB Security Group for HTTP"
   # ingress {
   #   from_port   = 5432
@@ -167,7 +183,7 @@ resource "aws_security_group" "db_sec_group" {
 }
 
 resource "aws_security_group_rule" "allow_guac" {
-  count = var.use_rds ? 1 : 0
+  count             = var.use_rds ? 1 : 0
   type              = "ingress"
   security_group_id = aws_security_group.db_sec_group[count.index].id
   from_port         = 5432

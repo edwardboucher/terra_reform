@@ -1,3 +1,5 @@
+> Vendored from terra_reform `modules/guacamole` @ a971fc2 (2026-10-28). Local change: embedded `provider "aws"` block removed so the caller's default_tags apply; `volume_tags` variable added for the server's EBS volumes.
+
 Builds an external guac server(s) behind an ALB<br>
 EXAMPLE 01:<br>
 module "guac001" {<br>

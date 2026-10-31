@@ -1,7 +1,9 @@
 #!/bin/bash
-# Creates/updates Guacamole connections via the REST API, driven by a JSON
-# definitions file. Matches existing connections by name, so it is safe to
-# re-run (e.g. on every deploy) without creating duplicates.
+# Syncs Guacamole connections via the REST API, driven by a JSON definitions
+# file. Connections are kept in a dedicated connection group
+# ($GUAC_MANAGED_GROUP, default "AWS Instances"): entries are matched by name
+# within that group and updated in place, and any connection in the group that
+# is no longer in the file is deleted. Safe to re-run on every deploy.
 #
 # Usage: guac_add_connections.sh <admin_user> <admin_pass> <connections.json>
 #
@@ -43,23 +45,22 @@ CONNECTIONS_FILE="${3:?usage: $0 <admin_user> <admin_pass> <connections_json_pat
 GUAC_BASE_URL="${GUAC_BASE_URL:-https://localhost:8443}"
 CURL=(curl -sk)
 
-echo "Waiting for Guacamole API to come up..."
-for i in $(seq 1 30); do
-  code=$("${CURL[@]}" -o /dev/null -w '%{http_code}' "${GUAC_BASE_URL}/api/tokens" || true)
-  # a real response (even a 400 for a bad/empty POST) means the app is serving requests
-  if [ "$code" != "000" ]; then
+# Retry the login itself rather than probing for any HTTP response: nginx
+# answers (502) well before the guacamole webapp and its DB schema are ready.
+echo "Waiting for Guacamole API and authenticating as ${GUAC_ADMIN_USER}..."
+AUTH_TOKEN=""
+for i in $(seq 1 60); do
+  AUTH_RESPONSE=$("${CURL[@]}" -X POST \
+    --data-urlencode "username=${GUAC_ADMIN_USER}" \
+    --data-urlencode "password=${GUAC_ADMIN_PASS}" \
+    "${GUAC_BASE_URL}/api/tokens" || true)
+  AUTH_TOKEN=$(echo "$AUTH_RESPONSE" | jq -r '.authToken // empty' 2>/dev/null || true)
+  if [ -n "$AUTH_TOKEN" ]; then
     break
   fi
   sleep 5
 done
 
-echo "Authenticating as ${GUAC_ADMIN_USER}..."
-AUTH_RESPONSE=$("${CURL[@]}" -X POST \
-  --data-urlencode "username=${GUAC_ADMIN_USER}" \
-  --data-urlencode "password=${GUAC_ADMIN_PASS}" \
-  "${GUAC_BASE_URL}/api/tokens")
-
-AUTH_TOKEN=$(echo "$AUTH_RESPONSE" | jq -r '.authToken // empty')
 DATA_SOURCE=$(echo "$AUTH_RESPONSE" | jq -r '.dataSource // empty')
 
 if [ -z "$AUTH_TOKEN" ]; then
@@ -69,17 +70,46 @@ fi
 
 API="${GUAC_BASE_URL}/api/session/data/${DATA_SOURCE}"
 
-# Snapshot existing connections once so repeated runs update in place by name
-# instead of piling up duplicates.
-EXISTING=$("${CURL[@]}" "${API}/connections?token=${AUTH_TOKEN}")
+# Managed connections live in their own connection group so connections that
+# were added by hand in the UI are never updated or deleted by this script.
+GUAC_MANAGED_GROUP="${GUAC_MANAGED_GROUP:-AWS Instances}"
+GROUP_ID=$("${CURL[@]}" "${API}/connectionGroups?token=${AUTH_TOKEN}" | jq -r --arg name "$GUAC_MANAGED_GROUP" \
+  'to_entries[] | select(.value.name == $name and .value.parentIdentifier == "ROOT") | .key' | head -n1)
+
+if [ -z "$GROUP_ID" ]; then
+  echo "Creating connection group '${GUAC_MANAGED_GROUP}'"
+  GROUP_ID=$(jq -n --arg name "$GUAC_MANAGED_GROUP" \
+    '{parentIdentifier: "ROOT", name: $name, type: "ORGANIZATIONAL", attributes: {}}' |
+    "${CURL[@]}" -X POST -H "Content-Type: application/json" -d @- \
+      "${API}/connectionGroups?token=${AUTH_TOKEN}" | jq -r '.identifier // empty')
+  if [ -z "$GROUP_ID" ]; then
+    echo "Failed to create connection group '${GUAC_MANAGED_GROUP}'" >&2
+    exit 1
+  fi
+fi
+
+# Snapshot the group's existing connections once so repeated runs update in
+# place by name instead of piling up duplicates.
+EXISTING=$("${CURL[@]}" "${API}/connections?token=${AUTH_TOKEN}" | jq --arg gid "$GROUP_ID" \
+  'with_entries(select(.value.parentIdentifier == $gid))')
+
+# Remove connections in the managed group that are no longer in the file
+# (instance dropped from guac_target_instances, or renamed).
+echo "$EXISTING" | jq -r --slurpfile want "$CONNECTIONS_FILE" \
+  '($want[0] | map(.name)) as $names | to_entries[] | select(.value.name as $n | $names | index($n) | not) | "\(.key)\t\(.value.name)"' |
+  while IFS=$'\t' read -r STALE_ID STALE_NAME; do
+    echo "Deleting connection '${STALE_NAME}' (id=${STALE_ID})"
+    "${CURL[@]}" -X DELETE "${API}/connections/${STALE_ID}?token=${AUTH_TOKEN}"
+    echo
+  done
 
 jq -c '.[]' "$CONNECTIONS_FILE" | while read -r conn; do
   NAME=$(echo "$conn" | jq -r '.name')
   EXISTING_ID=$(echo "$EXISTING" | jq -r --arg name "$NAME" \
     'to_entries[] | select(.value.name == $name) | .key' | head -n1)
 
-  BODY=$(echo "$conn" | jq '{
-    parentIdentifier: "ROOT",
+  BODY=$(echo "$conn" | jq --arg gid "$GROUP_ID" '{
+    parentIdentifier: $gid,
     name: .name,
     protocol: .protocol,
     parameters: .parameters,

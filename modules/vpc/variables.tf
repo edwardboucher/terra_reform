@@ -46,6 +46,6 @@ variable "region" {
 
 variable "usePrivateNAT" {
   description = "add NAT to private subnets"
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
 }

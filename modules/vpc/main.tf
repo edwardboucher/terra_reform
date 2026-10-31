@@ -9,16 +9,8 @@ terraform {
   required_version = ">= 1.2.0"
 }
 
-provider "aws" {
-  region = var.region
-  # default_tags {
-  #   tags = {
-  #   Environment = "development"
-  #   Application = "app-${random_string.random_suffix.result}"
-  #   Stack = "superstack"
-  #   }
-  # }
-}
+# No provider block: inherits the caller's aws provider (and its default_tags).
+# var.region is kept for interface compatibility with terra_reform.
 
 resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr
@@ -28,9 +20,9 @@ resource "aws_vpc" "this" {
 }
 
 resource "aws_subnet" "public" {
-  count = var.public_subnet_count
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = cidrsubnet(var.vpc_cidr, var.subnet_prefix, count.index)
+  count      = var.public_subnet_count
+  vpc_id     = aws_vpc.this.id
+  cidr_block = cidrsubnet(var.vpc_cidr, var.subnet_prefix, count.index)
   #cidr_block              = local.public_subnet_cidrs
   availability_zone       = element(data.aws_availability_zones.available.names, count.index)
   map_public_ip_on_launch = true
@@ -38,9 +30,9 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "private" {
-  count = var.private_subnet_count
-  vpc_id            = aws_vpc.this.id
-  cidr_block        = cidrsubnet(var.vpc_cidr, var.subnet_prefix, count.index + var.public_subnet_count)
+  count      = var.private_subnet_count
+  vpc_id     = aws_vpc.this.id
+  cidr_block = cidrsubnet(var.vpc_cidr, var.subnet_prefix, count.index + var.public_subnet_count)
   #cidr_block        = local.private_subnet_cidrs
   availability_zone = element(data.aws_availability_zones.available.names, count.index)
   tags              = merge(var.tags, { "Name" : "Private-${count.index + 1}" })
@@ -75,10 +67,10 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_flow_log" "this" {
-  log_group_name         = aws_cloudwatch_log_group.this.name
-  iam_role_arn           = aws_iam_role.this.arn
-  vpc_id                 = aws_vpc.this.id
-  traffic_type           = "ALL"
+  log_group_name = aws_cloudwatch_log_group.this.name
+  iam_role_arn   = aws_iam_role.this.arn
+  vpc_id         = aws_vpc.this.id
+  traffic_type   = "ALL"
 }
 
 resource "aws_cloudwatch_log_group" "this" {
@@ -138,8 +130,8 @@ resource "aws_nat_gateway" "private_nat" {
 }
 
 resource "aws_route" "private_nat" {
-  count = var.usePrivateNAT ? 1 : 0
-  route_table_id            = aws_default_route_table.default.id
-  destination_cidr_block    = "0.0.0.0/0"
-  nat_gateway_id = aws_nat_gateway.private_nat[count.index].id
+  count                  = var.usePrivateNAT ? 1 : 0
+  route_table_id         = aws_default_route_table.default.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.private_nat[count.index].id
 }

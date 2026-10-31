@@ -1,3 +1,5 @@
+> Vendored from terra_reform `modules/vpc` @ a971fc2 (2026-10-28). Local change: embedded `provider "aws"` block removed so the caller's default_tags apply.
+
 Terraform VPC Module
 This module creates an AWS Virtual Private Cloud (VPC) with two public and two private subnets, an Internet Gateway for public subnet connectivity, and VPC Flow Logs for traffic monitoring.
 
